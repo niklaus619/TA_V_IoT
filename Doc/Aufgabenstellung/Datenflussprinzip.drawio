@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="simple-dataflow" name="Datenfluss">
-        <mxGraphModel dx="1668" dy="892" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="800" math="0" shadow="0">
+        <mxGraphModel dx="829" dy="534" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="800" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -13,7 +13,7 @@
                 <mxCell id="rpi1" value="&lt;b&gt;Raspberry Pi 1&lt;br&gt;Steuerung&lt;/b&gt;&lt;br&gt;&lt;br&gt;&amp;nbsp;• BLE-Gateway&amp;nbsp;&lt;div&gt;&amp;nbsp;• Raumklima-Regelalgorithmus&amp;nbsp;&lt;/div&gt;&lt;div&gt;• Sense HAT V2&amp;nbsp;&lt;/div&gt;&lt;div&gt;• Luftfeuchtigkeit&lt;/div&gt;&lt;div&gt;• Heizen / Kühlen&lt;/div&gt;&lt;div&gt;• LED-Matrix rot / blau&lt;/div&gt;&lt;div&gt;• Storenlogik&amp;nbsp;&lt;/div&gt;&lt;div&gt;• lokale Zustandsverwaltung&amp;nbsp;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=2;fontSize=16;" parent="1" vertex="1">
                     <mxGeometry x="540" y="170" width="360" height="410" as="geometry"/>
                 </mxCell>
-                <mxCell id="rpi2" value="&lt;b&gt;Raspberry Pi 2&lt;/b&gt;&lt;div&gt;&lt;b&gt;IoT Server&lt;br&gt;&lt;/b&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;• SQL-Datenbank&amp;nbsp;&lt;/div&gt;&lt;div&gt;• Historisierung&lt;/div&gt;&lt;div&gt;• Zeitreihen&lt;/div&gt;&lt;div&gt;• Dashboard&amp;nbsp;&lt;/div&gt;&lt;div&gt;• Parametrierung&amp;nbsp;&lt;/div&gt;&lt;div&gt;• Fernsteuerung&lt;/div&gt;&lt;div&gt;• IoT-API&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=2;fontSize=16;" parent="1" vertex="1">
+                <mxCell id="rpi2" value="&lt;b&gt;Raspberry Pi 2&lt;/b&gt;&lt;div&gt;&lt;b&gt;IoT Server&amp;lt;&lt;br&gt;(Flask)&lt;br&gt;&lt;/b&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;• SQL-Datenbank&amp;nbsp;&lt;/div&gt;&lt;div&gt;• Historisierung&lt;/div&gt;&lt;div&gt;• Zeitreihen&lt;/div&gt;&lt;div&gt;• Dashboard&amp;nbsp;&lt;/div&gt;&lt;div&gt;• Parametrierung&amp;nbsp;&lt;/div&gt;&lt;div&gt;• Fernsteuerung&lt;/div&gt;&lt;div&gt;• IoT-API&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=2;fontSize=16;" parent="1" vertex="1">
                     <mxGeometry x="1100" y="230" width="300" height="290" as="geometry"/>
                 </mxCell>
                 <mxCell id="ble" value="&lt;b&gt;Bluetooth / BLE&lt;/b&gt;&lt;br&gt;Messwerte ↔ Stellbefehle" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;startArrow=block;startFill=1;endArrow=block;endFill=1;strokeWidth=3;fontSize=14;" parent="1" source="ada" target="rpi1" edge="1">
@@ -25,7 +25,7 @@
                 <mxCell id="4" value="" style="edgeStyle=none;html=1;" parent="1" source="3" target="rpi2" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="5" value="Internet" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="4">
+                <mxCell id="5" value="Internet" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="4" vertex="1" connectable="0">
                     <mxGeometry x="0.1455" y="1" relative="1" as="geometry">
                         <mxPoint as="offset"/>
                     </mxGeometry>
