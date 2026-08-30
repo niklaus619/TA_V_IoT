@@ -5,6 +5,10 @@ from adafruit_circuitplayground import cp
 
 GREEN = (0, 80, 0)
 OFF = (0, 0, 0)
+BRIGHTNESS = 0.3
+
+# Globale Helligkeit aller NeoPixel: 0.0 = aus, 1.0 = maximal.
+cp.pixels.brightness = BRIGHTNESS
 
 _closed = False
 
