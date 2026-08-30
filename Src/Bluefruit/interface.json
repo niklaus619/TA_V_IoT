@@ -1,0 +1,8 @@
+{
+  "temperature": 23.4,
+  "light": 618,
+  "humidity": 46.2,
+  "blind": "closed",
+  "heating": false,
+  "cooling": true
+}
