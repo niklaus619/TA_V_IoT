@@ -6,7 +6,7 @@
 | --------------- | ---------------------------- | ------------: | ------------------------------------------------------------- |
 | Demirtay, Ebru  | Dipl. Systemtechniker/-in HF |          2024 | Controlling, Dokumentation, Plakat und Social-Media-Video     |
 | Janett, Niklaus | Dipl. Systemtechniker/-in HF |          2024 | Projektcontrolling und technische Programmierung              |
-| Germann, Joel   | Dipl. Systemtechniker/-in HF |          2026 | RapbCtrl Entwicklung                                                   |
+| Germann, Joel   | Dipl. Systemtechniker/-in HF |          2026 | RapbCtrl Entwicklung                                          |
 
 ## IT
 
