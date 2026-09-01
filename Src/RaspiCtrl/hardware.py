@@ -30,6 +30,7 @@ class BluefruitSerial:
             try:
                 message = json.loads(raw.decode("utf-8"))
                 if isinstance(message, dict):
+                    print("BLUEFRUIT RX:", json.dumps(message, separators=(",", ":")))
                     messages.append(message)
             except (UnicodeError, ValueError):
                 LOG.warning("Ungueltige JSON-Nachricht vom Bluefruit verworfen")

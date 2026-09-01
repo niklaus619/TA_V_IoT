@@ -15,6 +15,7 @@ def send(message):
     if _serial is None:
         return
     payload = json.dumps(message) + "\n"
+    # Die exakt gesendete Nachricht auf der separaten Konsole anzeigen.
     _serial.write(payload.encode("utf-8"))
 
 
