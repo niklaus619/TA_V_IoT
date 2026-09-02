@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="adafruit-flow" name="Adafruit Programmablauf">
-        <mxGraphModel dx="2034" dy="873" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1000" math="0" shadow="0">
+        <mxGraphModel dx="1644" dy="1120" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1000" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -50,10 +50,10 @@
                     <mxGeometry x="1030" y="460" width="210" height="70" as="geometry"/>
                 </mxCell>
                 <mxCell id="status" value="Store-Zustand ergänzen&lt;br&gt;Status als JSON an Raspberry Pi senden" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
-                    <mxGeometry x="1355" y="450" width="250" height="80" as="geometry"/>
+                    <mxGeometry x="1310" y="450" width="250" height="80" as="geometry"/>
                 </mxCell>
                 <mxCell id="wait" value="10 ms warten" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;" parent="1" vertex="1">
-                    <mxGeometry x="1390" y="325" width="180" height="60" as="geometry"/>
+                    <mxGeometry x="1345" y="325" width="180" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="start" target="boot" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
