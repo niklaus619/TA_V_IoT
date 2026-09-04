@@ -1,11 +1,10 @@
 Datum,Zeit,Stundenaufwand,Beschrieb der Tätigkeit
-,,,
-
-
-,,,
-,,,
-,,,
-,,,
+24.08.2026,21:34–21:42,ca. 1 h,AP2 Aufgabenstellung und Datenfluss. AP1 Ordnerstruktur.
+28.08.2026,10:54–11:51,ca. 1 h,AP1 Projektdokumente und Arbeitspakete. AP2 Systemarchitektur und JSON-Schnittstellen.
+30.08.2026,16:32–20:21,ca. 4 h,AP1 Teamssitzung AP aufteilung und Arbeitszuweisung auf Mitarbeiter
+30.08.2026,21:50–22:50,ca. 1 h,AP3 Bluefruit Grundprogramm erstellt. Temperatur- und Lichtsensor ausgelesen. Storenanzeige mit NeoPixeln sowie JSON-Kommunikation über USB CDC umgesetzt und getestet.
+01.09.2026,21:03–23:11,ca. 1 h,AP3 RaspiCtrl gemeinsam entwickelt. Adafruit- und RaspiCtrl-Schnittstelle zusammengefuehrt sowie serielle USB-CDC-Kommunikation auf Raspberry Pi 1 getestet.
+02.09.2026,13:00-16:00,ca. 3h,AP1 Projectcontrolling AP9 Dokumentation
 ,,,
 ,,,
 ,,,
