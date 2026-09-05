@@ -106,5 +106,26 @@ class RaspiControllerApp:
 
             return
 
+        # NeoPixel-Befehl an das Sense HAT weiterleiten.
+        if command_type == "set_sense_neopixel":
+            on = command.get("on")
+
+            # Der Zustand muss eindeutig als true oder false uebertragen werden.
+            if not isinstance(on, bool):
+                LOG.warning(
+                    "Ungueltiger Sense-HAT-NeoPixel-Befehl: %r",
+                    command
+                )
+                return
+
+            self.sense_hat.set_neopixels(on)
+
+            LOG.info(
+                "Sense-HAT NeoPixel auf %s gesetzt",
+                "EIN" if on else "AUS"
+            )
+
+            return
+
         # Unbekannte Befehle nicht ausfuehren.
         LOG.warning("Unbekannter Serverbefehl: %r", command)

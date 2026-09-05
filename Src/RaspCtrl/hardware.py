@@ -50,6 +50,7 @@ class SenseHatAdapter:
     def __init__(self, simulate: bool = False, simulated_humidity: float = 45.0):
         self._simulated_humidity = simulated_humidity
         self._sense: Optional[Any] = None
+        self._manual_neopixels: Optional[bool] = None
         if not simulate:
             try:
                 from sense_hat import SenseHat
@@ -65,5 +66,22 @@ class SenseHatAdapter:
     def display(self, heating: bool, cooling: bool) -> None:
         if self._sense is None:
             return
+
+        # Manuell gesetzten NeoPixel-Zustand beibehalten.
+        if self._manual_neopixels is not None:
+            color = (80, 80, 80) if self._manual_neopixels else (0, 0, 0)
+            self._sense.clear(*color)
+            return
+
         mode = "heating" if heating else "cooling" if cooling else "off"
         self._sense.clear(*self.COLORS[mode])
+
+    def set_neopixels(self, enabled: bool) -> None:
+        #Sense-HAT-NeoPixel manuell ein- oder ausschalten.#
+        self._manual_neopixels = bool(enabled)
+
+        if self._sense is None:
+            return
+
+        color = (80, 80, 80) if enabled else (0, 0, 0)
+        self._sense.clear(*color)
