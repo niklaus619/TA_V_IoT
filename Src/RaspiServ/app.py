@@ -160,6 +160,22 @@ def index():
 </div>
 
 <div class="card">
+    <h2>CPB NeoPixel</h2>
+
+    <div style="display:flex; gap:10px;">
+        <button onclick="setCpbNeopixel(true)">
+            EIN
+        </button>
+
+        <button onclick="setCpbNeopixel(false)">
+            AUS
+        </button>
+    </div>
+
+    <p id="cpbNeopixelResult"></p>
+</div>
+
+<div class="card">
     <h2>Zeitraum</h2>
 
     <div style="display:flex; gap:10px; flex-wrap:wrap;">
@@ -213,6 +229,60 @@ function setHistoryRange(minutes) {
     historyMinutes = minutes;
 
     updateHistory();
+}
+
+async function setCpbNeopixel(on) {
+
+    const result =
+        document.getElementById(
+            "cpbNeopixelResult"
+        );
+
+    try {
+
+        const response = await fetch(
+            "/api/cpb-neopixel",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body: JSON.stringify({
+                    on: on
+                })
+            }
+        );
+
+        const data =
+            await response.json();
+
+        if (response.ok && data.ok) {
+
+            result.textContent =
+                on
+                    ? "NeoPixel eingeschaltet."
+                    : "NeoPixel ausgeschaltet.";
+
+        } else {
+
+            result.textContent =
+                data.error ||
+                "Fehler beim Schalten.";
+
+        }
+
+    }
+    catch (error) {
+
+        result.textContent =
+            "Fehler bei der Verbindung.";
+
+        console.error(error);
+
+    }
 }
 
 async function updateStatus() {
