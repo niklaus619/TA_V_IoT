@@ -707,8 +707,7 @@ def history():
     if minutes not in allowed_minutes:
         minutes = 5
 
-    measurements =
-        get_measurements_since(minutes)
+    measurements = get_measurements_since(minutes)
 
     return jsonify(measurements)
 
