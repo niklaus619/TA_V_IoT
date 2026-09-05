@@ -109,6 +109,28 @@ def index():
         <strong id="cooling">-</strong>
     </div>
 
+    <div class="card">
+    <h2>Solltemperatur</h2>
+
+    <div style="display:flex; align-items:center; gap:15px;">
+        <button onclick="changeTemperature(-0.5)">−</button>
+
+        <span id="targetTemperature" class="value">
+            22.0 °C
+        </span>
+
+        <button onclick="changeTemperature(0.5)">+</button>
+    </div>
+
+    <br>
+
+    <button onclick="sendTargetTemperature()">
+        Übernehmen
+    </button>
+
+    <p id="commandResult"></p>
+    </div>
+
 </div>
 
 
@@ -210,6 +232,77 @@ setInterval(
     updateStatus,
     1000
 );
+let targetTemperature = 22.0;
+
+
+function changeTemperature(change) {
+
+    targetTemperature += change;
+
+    if (targetTemperature < 5) {
+        targetTemperature = 5;
+    }
+
+    if (targetTemperature > 35) {
+        targetTemperature = 35;
+    }
+
+    document.getElementById(
+        "targetTemperature"
+    ).textContent =
+        targetTemperature.toFixed(1) + " °C";
+}
+
+
+async function sendTargetTemperature() {
+
+    const result =
+        document.getElementById(
+            "commandResult"
+        );
+
+    try {
+
+        const response = await fetch(
+            "/api/target-temperature",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body: JSON.stringify({
+                    target_temperature:
+                        targetTemperature
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        if (data.ok) {
+
+            result.textContent =
+                "Solltemperatur auf " +
+                data.target_temperature +
+                " °C gesetzt.";
+
+        } else {
+
+            result.textContent =
+                data.error;
+        }
+
+    } catch (error) {
+
+        result.textContent =
+            "Fehler beim Senden.";
+
+        console.error(error);
+    }
+}
 
 </script>
 
