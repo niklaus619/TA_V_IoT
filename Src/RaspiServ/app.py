@@ -160,6 +160,26 @@ def index():
 </div>
 
 <div class="card">
+    <h2>Zeitraum</h2>
+
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+
+        <button onclick="setHistoryRange(5)">
+            5 Minuten
+        </button>
+
+        <button onclick="setHistoryRange(30)">
+            30 Minuten
+        </button>
+
+        <button onclick="setHistoryRange(60)">
+            1 Stunde
+        </button>
+
+    </div>
+</div>
+
+<div class="card">
     <h2>Temperaturverlauf</h2>
     <canvas id="temperatureChart"></canvas>
 </div>
@@ -186,6 +206,13 @@ let temperatureDeadbandDirty = false;
 let temperatureChart;
 let humidityChart;
 let lightChart;
+let historyMinutes = 5;
+
+function setHistoryRange(minutes) {
+
+    historyMinutes = minutes;
+
+    updateHistory();
 
 async function updateStatus() {
 
@@ -566,7 +593,10 @@ async function updateHistory() {
     try {
 
         const response =
-            await fetch("/api/history?limit=100");
+            await fetch(
+                "/api/history?minutes=" +
+                historyMinutes
+        );
 
         const measurements =
             await response.json();
