@@ -735,7 +735,7 @@ function createCharts() {
                     {
                         label: "Temperatur °C",
                         data: [],
-                        tension: 0.2
+                        tension: 0.2,
                         pointRadius: 0,
                         pointHoverRadius: 4,
                         borderWidth: 2
@@ -774,7 +774,7 @@ function createCharts() {
                     {
                         label: "Luftfeuchtigkeit %",
                         data: [],
-                        tension: 0.2
+                        tension: 0.2,
                         pointRadius: 0,
                         pointHoverRadius: 4,
                         borderWidth: 2
@@ -813,7 +813,7 @@ function createCharts() {
                     {
                         label: "Licht",
                         data: [],
-                        tension: 0.2
+                        tension: 0.2,
                         pointRadius: 0,
                         pointHoverRadius: 4,
                         borderWidth: 2
