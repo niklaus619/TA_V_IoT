@@ -23,3 +23,7 @@ def set_closed(closed):
 def is_closed():
     #Den zuletzt eingestellten Storenstatus zurueckgeben.#
     return _closed
+
+def set_neopixels(enabled):
+    #NeoPixel ueber die IoT-Plattform ein- oder ausschalten.#
+    cp.pixels.fill(GREEN if enabled else OFF)

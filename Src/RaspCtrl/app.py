@@ -61,12 +61,50 @@ class RaspiControllerApp:
             self._last_status_sent = now
 
     def _handle_server_command(self, command: Dict[str, Any]) -> None:
-        if command.get("type") != "set_parameters":
-            LOG.warning("Unbekannter Serverbefehl: %r", command)
+        command_type = command.get("type")
+
+        # Regelparameter vom IoT-Server verarbeiten.
+        if command_type == "set_parameters":
+            allowed = (
+                "target_temperature",
+                "temperature_deadband",
+                "daylight_threshold",
+                "passive_delay_seconds"
+            )
+
+            parameters = {
+                key: command[key]
+                for key in allowed
+                if key in command
+            }
+
+            try:
+                self.controller.set_parameters(**parameters)
+            except (TypeError, ValueError) as exc:
+                LOG.warning("Ungueltige Regelparameter: %s", exc)
+
             return
-        allowed = ("target_temperature", "temperature_deadband", "daylight_threshold", "passive_delay_seconds")
-        parameters = {key: command[key] for key in allowed if key in command}
-        try:
-            self.controller.set_parameters(**parameters)
-        except (TypeError, ValueError) as exc:
-            LOG.warning("Ungueltige Regelparameter: %s", exc)
+
+        # NeoPixel-Befehl an den Bluefruit weiterleiten.
+        if command_type == "set_cpb_neopixel":
+            on = command.get("on")
+
+            # Der Zustand muss eindeutig als true oder false uebertragen werden.
+            if not isinstance(on, bool):
+                LOG.warning("Ungueltiger NeoPixel-Befehl: %r", command)
+                return
+
+            self.bluefruit.send({
+                "type": "set_neopixel",
+                "on": on,
+            })
+
+            LOG.info(
+                "CPB NeoPixel auf %s gesetzt",
+                "EIN" if on else "AUS"
+            )
+
+            return
+
+        # Unbekannte Befehle nicht ausfuehren.
+        LOG.warning("Unbekannter Serverbefehl: %r", command)

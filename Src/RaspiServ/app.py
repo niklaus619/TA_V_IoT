@@ -809,7 +809,37 @@ def set_temperature_deadband():
     return jsonify({
         "ok": True,
         "temperature_deadband": temperature_deadband,
-    })   
+    })
+
+@app.route("/api/cpb-neopixel", methods=["POST"])
+def set_cpb_neopixel():
+    data = request.get_json(silent=True) or {}
+
+    on = data.get("on")
+
+    # Der Zustand muss eindeutig als true oder false uebertragen werden.
+    if not isinstance(on, bool):
+        return jsonify({
+            "ok": False,
+            "error": "on muss true oder false sein"
+        }), 400
+
+    try:
+        raspctrl_server.send_command({
+            "type": "set_cpb_neopixel",
+            "on": on,
+        })
+
+    except ConnectionError:
+        return jsonify({
+            "ok": False,
+            "error": "RaspCtrl ist nicht verbunden"
+        }), 503
+
+    return jsonify({
+        "ok": True,
+        "on": on,
+    })
 
 def start_tcp_server():
 

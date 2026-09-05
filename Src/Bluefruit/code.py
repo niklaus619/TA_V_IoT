@@ -5,7 +5,6 @@ import time
 import blind
 import sensor
 import server
-import neopixel_control
 
 
 SENSOR_INTERVAL_SECONDS = 1.0
@@ -56,7 +55,7 @@ def handle_message(message):
             return
 
         # NeoPixel ein- oder ausschalten.
-        neopixel_control.set_enabled(on)
+        blind.set_neopixels(on)
 
         # Den neuen NeoPixel-Zustand an den Raspberry Pi zurueckmelden.
         server.send({
