@@ -748,6 +748,17 @@ function createCharts() {
                 maintainAspectRatio: false,
                 animation: false,
 
+                interaction: {
+                    mode: "index",
+                    intersect: false
+                },
+
+                plugins: {
+                    tooltip: {
+                        enabled: true
+                    }
+                },
+
                 scales: {
                     x: {
                         ticks: {
@@ -786,6 +797,17 @@ function createCharts() {
                 responsive: true,
                 maintainAspectRatio: false,
                 animation: false,
+
+                interaction: {
+                    mode: "index",
+                    intersect: false
+                },
+
+                plugins: {
+                    tooltip: {
+                        enabled: true
+                    }
+                },
 
                 scales: {
                     x: {
@@ -827,15 +849,26 @@ function createCharts() {
                 maintainAspectRatio: false,
                 animation: false,
 
-                scales: {
-                    x: {
-                        ticks: {
+                interaction: {
+                    mode: "index",
+                    intersect: false
+             },
+
+            plugins: {
+                tooltip: {
+                    enabled: true
+                }
+            },
+
+            scales: {
+                x: {
+                    ticks: {
                         autoSkip: true,
-                            maxTicksLimit: 6,
-                            maxRotation: 0,
-                            minRotation: 0
-                        }
+                        maxTicksLimit: 6,
+                        maxRotation: 0,
+                        minRotation: 0
                      }
+                    }
                 }
             }
         }
