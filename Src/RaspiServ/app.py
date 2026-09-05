@@ -213,6 +213,7 @@ function setHistoryRange(minutes) {
     historyMinutes = minutes;
 
     updateHistory();
+}
 
 async function updateStatus() {
 
