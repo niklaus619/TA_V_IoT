@@ -3,7 +3,11 @@ import threading
 from flask import Flask, jsonify, request
 
 from server import RaspCtrlServer
-from database import initialize_database, get_measurements
+from database import (
+    initialize_database,
+    get_measurements,
+    get_measurements_since,
+)
 
 
 app = Flask(__name__)
@@ -685,22 +689,26 @@ def status():
 def history():
 
     try:
-        limit = int(
+        minutes = int(
             request.args.get(
-                "limit",
-                100
+                "minutes",
+                5
             )
         )
     except ValueError:
-        limit = 100
+        minutes = 5
 
-    # Nicht unbegrenzt viele Datensätze zurückgeben
-    limit = max(
-        1,
-        min(limit, 1000)
-    )
+    allowed_minutes = {
+        5,
+        30,
+        60,
+    }
 
-    measurements = get_measurements(limit)
+    if minutes not in allowed_minutes:
+        minutes = 5
+
+    measurements =
+        get_measurements_since(minutes)
 
     return jsonify(measurements)
 
