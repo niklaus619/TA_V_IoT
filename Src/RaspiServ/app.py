@@ -911,11 +911,39 @@ def set_cpb_neopixel():
         "on": on,
     })
 
+@app.route("/api/sense-neopixel", methods=["POST"])
+def set_sense_neopixel():
+    data = request.get_json(silent=True) or {}
+
+    on = data.get("on")
+
+    # Der Zustand muss eindeutig als true oder false uebertragen werden.
+    if not isinstance(on, bool):
+        return jsonify({
+            "ok": False,
+            "error": "on muss true oder false sein"
+        }), 400
+
+    try:
+        raspctrl_server.send_command({
+            "type": "set_sense_neopixel",
+            "on": on,
+        })
+
+    except ConnectionError:
+        return jsonify({
+            "ok": False,
+            "error": "RaspCtrl ist nicht verbunden"
+        }), 503
+
+    return jsonify({
+        "ok": True,
+        "on": on,
+    })
+
 def start_tcp_server():
 
     raspctrl_server.serve_forever()
-
-
 
 if __name__ == "__main__":
 
