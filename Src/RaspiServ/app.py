@@ -136,6 +136,10 @@ def index():
 
 <script>
 
+let targetTemperature = 22.0;
+let targetTemperatureDirty = false;
+
+
 async function updateStatus() {
 
     try {
@@ -169,6 +173,22 @@ async function updateStatus() {
 
 
         const status = data.status;
+
+
+        // Aktuellen Sollwert von RaspCtrl übernehmen
+        if (
+            status.target_temperature !== undefined &&
+            !targetTemperatureDirty
+        ) {
+
+            targetTemperature =
+                Number(status.target_temperature);
+
+            document.getElementById(
+                "targetTemperature"
+            ).textContent =
+                targetTemperature.toFixed(1) + " °C";
+        }
 
 
         document.getElementById(
@@ -226,18 +246,13 @@ async function updateStatus() {
 }
 
 
-updateStatus();
-
-setInterval(
-    updateStatus,
-    1000
-);
-let targetTemperature = 22.0;
-
-
 function changeTemperature(change) {
 
     targetTemperature += change;
+
+    // Benutzer bearbeitet den Wert gerade
+    targetTemperatureDirty = true;
+
 
     if (targetTemperature < 5) {
         targetTemperature = 5;
@@ -246,6 +261,7 @@ function changeTemperature(change) {
     if (targetTemperature > 35) {
         targetTemperature = 35;
     }
+
 
     document.getElementById(
         "targetTemperature"
@@ -260,6 +276,7 @@ async function sendTargetTemperature() {
         document.getElementById(
             "commandResult"
         );
+
 
     try {
 
@@ -280,9 +297,18 @@ async function sendTargetTemperature() {
             }
         );
 
-        const data = await response.json();
+
+        const data =
+            await response.json();
+
 
         if (data.ok) {
+
+            targetTemperature =
+                Number(data.target_temperature);
+
+            // Ab jetzt wieder echten Wert von RaspCtrl übernehmen
+            targetTemperatureDirty = false;
 
             result.textContent =
                 "Solltemperatur auf " +
@@ -295,7 +321,8 @@ async function sendTargetTemperature() {
                 data.error;
         }
 
-    } catch (error) {
+    }
+    catch (error) {
 
         result.textContent =
             "Fehler beim Senden.";
@@ -303,6 +330,14 @@ async function sendTargetTemperature() {
         console.error(error);
     }
 }
+
+
+updateStatus();
+
+setInterval(
+    updateStatus,
+    1000
+);
 
 </script>
 
