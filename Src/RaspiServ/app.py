@@ -3,7 +3,7 @@ import threading
 from flask import Flask, jsonify, request
 
 from server import RaspCtrlServer
-from database import initialize_database
+from database import initialize_database, get_measurements
 
 
 app = Flask(__name__)
@@ -467,6 +467,29 @@ def status():
                 raspctrl_server.get_latest_status(),
         }
     )
+
+@app.route("/api/history")
+def history():
+
+    try:
+        limit = int(
+            request.args.get(
+                "limit",
+                100
+            )
+        )
+    except ValueError:
+        limit = 100
+
+    # Nicht unbegrenzt viele Datensätze zurückgeben
+    limit = max(
+        1,
+        min(limit, 1000)
+    )
+
+    measurements = get_measurements(limit)
+
+    return jsonify(measurements)
 
 @app.route("/api/target-temperature", methods=["POST"])
 def set_target_temperature():

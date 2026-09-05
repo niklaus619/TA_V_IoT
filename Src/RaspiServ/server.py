@@ -145,8 +145,8 @@ class RaspCtrlServer:
                 raise ConnectionError("RaspCtrl ist nicht verbunden")
 
             self._client.sendall(payload)
-
-    def main() -> None:
+            
+def main() -> None:
         logging.basicConfig(
             level=logging.INFO,
             format="%(asctime)s %(levelname)s %(message)s",
