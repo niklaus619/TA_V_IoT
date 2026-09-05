@@ -7,6 +7,7 @@ import logging
 import socket
 import threading
 from typing import Any, Dict, Optional
+from Src.Bluefruit import server
 from database import save_measurement
 
 
@@ -145,13 +146,13 @@ class RaspCtrlServer:
             self._client.sendall(payload)
 
     def main() -> None:
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s %(levelname)s %(message)s",
-    )
+        logging.basicConfig(
+            level=logging.INFO,
+            format="%(asctime)s %(levelname)s %(message)s",
+        )
 
-    server = RaspCtrlServer()
-    server.serve_forever()
+        server = RaspCtrlServer()
+        server.serve_forever()
 
 
 if __name__ == "__main__":
