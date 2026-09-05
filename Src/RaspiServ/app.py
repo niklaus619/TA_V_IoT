@@ -32,37 +32,93 @@ def index():
     <title>RaspServ</title>
 
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: Arial, sans-serif;
-            background: #f2f2f2;
+            background: #0f172a;
+            color: #e2e8f0;
             margin: 0;
             padding: 20px;
         }
 
         .container {
-            max-width: 500px;
+            max-width: 1400px;
             margin: auto;
+
+            display: grid;
+            grid-template-columns:
+                repeat(auto-fit, minmax(260px, 1fr));
+
+            gap: 16px;
         }
 
         .card {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+        }
+
+        .card h1,
+        .card h2 {
+            margin-top: 0;
         }
 
         .value {
             font-size: 26px;
             font-weight: bold;
+            color: #f8fafc;
+            margin-top: 8px;
+        }
+
+        button {
+            background: #334155;
+            color: #f8fafc;
+            border: 1px solid #475569;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            background: #475569;
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(0);
         }
 
         .connected {
-            color: green;
+            color: #4ade80;
         }
 
         .disconnected {
-            color: red;
+            color: #f87171;
+        }
+
+        canvas {
+            max-height: 280px;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                padding: 16px;
+            }
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
