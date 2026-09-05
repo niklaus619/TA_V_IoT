@@ -3,6 +3,7 @@ import threading
 from flask import Flask, jsonify, request
 
 from server import RaspCtrlServer
+from database import initialize_database
 
 
 app = Flask(__name__)
@@ -541,7 +542,15 @@ def start_tcp_server():
     raspctrl_server.serve_forever()
 
 
+
 if __name__ == "__main__":
+
+    initialize_database()
+
+    tcp_thread = threading.Thread(
+        target=start_tcp_server,
+        daemon=True,
+    )
 
     tcp_thread = threading.Thread(
         target=start_tcp_server,

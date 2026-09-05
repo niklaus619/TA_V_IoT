@@ -1,10 +1,12 @@
 """TCP-Server fuer die Kommunikation mit RaspCtrl."""
 
+from email import message
 import json
 import logging
 import socket
 import threading
 from typing import Any, Dict, Optional
+from database import save_measurement
 
 
 LOG = logging.getLogger(__name__)
@@ -99,16 +101,19 @@ class RaspCtrlServer:
 
                 self._process_message(message)
 
-    def _process_message(self, message: Dict[str, Any]) -> None:
-        """Verarbeitet Nachrichten von RaspCtrl."""
+def _process_message(self, message: Dict[str, Any]) -> None:
+    """Verarbeitet Nachrichten von RaspCtrl."""
 
-        if message.get("type") == "status":
-            with self._status_lock:
-                self._latest_status = message.copy()
+    if message.get("type") == "status":
+        with self._status_lock:
+            self._latest_status = message.copy()
 
-            LOG.info("Status von RaspCtrl: %s", message)
-        else:
-            LOG.info("Nachricht von RaspCtrl: %s", message)
+        save_measurement(message)
+
+        LOG.info("Status von RaspCtrl: %s", message)
+
+    else:
+        LOG.info("Nachricht von RaspCtrl: %s", message)
 
     def get_latest_status(self) -> Dict[str, Any]:
         """Gibt den zuletzt empfangenen Status zurueck."""
