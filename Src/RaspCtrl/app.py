@@ -56,6 +56,7 @@ class RaspiControllerApp:
                 "heating": state.heating,
                 "cooling": state.cooling,
                 "target_temperature": self.controller.config.target_temperature,
+                "temperature_deadband": self.controller.config.temperature_deadband,
             })
             self._last_status_sent = now
 
