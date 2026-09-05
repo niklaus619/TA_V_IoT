@@ -5,6 +5,7 @@ import time
 import blind
 import sensor
 import server
+import neopixel_control
 
 
 SENSOR_INTERVAL_SECONDS = 1.0
@@ -28,22 +29,43 @@ def send_status():
 
 def handle_message(message):
     #Einen vom Raspberry Pi empfangenen Storenbefehl verarbeiten.#
-    # Nur Befehle fuer die Store werden von diesem Programm akzeptiert.
-    if message.get("type") != "set_blind":
-        server.send({"type": "error", "message": "unknown_command"})
+    # Befehle fuer die Store und die NeoPixel werden verarbeitet.
+    command_type = message.get("type")
+
+    if command_type == "set_blind":
+        closed = message.get("closed")
+        # Der Zustand muss eindeutig als true oder false uebertragen werden.
+        if not isinstance(closed, bool):
+            server.send({"type": "error", "message": "closed_must_be_boolean"})
+            return
+
+        blind.set_closed(closed)
+        server.send({
+            "type": "blind_state",
+            "blind": "closed" if blind.is_closed() else "open",
+        })
         return
 
-    closed = message.get("closed")
-    # Der Zustand muss eindeutig als true oder false uebertragen werden.
-    if not isinstance(closed, bool):
-        server.send({"type": "error", "message": "closed_must_be_boolean"})
+    # Befehl zum Ein- oder Ausschalten der NeoPixel verarbeiten.
+    if command_type == "set_neopixel":
+        on = message.get("on")
+
+        # Der Zustand muss eindeutig als true oder false uebertragen werden.
+        if not isinstance(on, bool):
+            server.send({"type": "error", "message": "on_must_be_boolean"})
+            return
+
+        # NeoPixel ein- oder ausschalten.
+        neopixel_control.set_enabled(on)
+
+        # Den neuen NeoPixel-Zustand an den Raspberry Pi zurueckmelden.
+        server.send({
+            "type": "neopixel_state",
+            "on": on,
+        })
         return
 
-    blind.set_closed(closed)
-    server.send({
-        "type": "blind_state",
-        "blind": "closed" if blind.is_closed() else "open",
-    })
+    server.send({"type": "error", "message": "unknown_command"})
 
 
 # Beim Programmstart ist die Store offen und die NeoPixel leuchten gruen.
