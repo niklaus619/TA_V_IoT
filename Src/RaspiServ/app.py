@@ -131,6 +131,27 @@ def index():
     <p id="commandResult"></p>
     </div>
 
+    <div class="card">
+    <h2>Totzone</h2>
+    <div style="display:flex; align-items:center; gap:15px;">
+        <button onclick="changeDeadband(-0.1)">−</button>
+
+        <span id="temperatureDeadband" class="value">
+            0.5 °C
+        </span>
+
+        <button onclick="changeDeadband(0.1)">+</button>
+    </div>
+
+    <br>
+
+    <button onclick="sendDeadband()">
+        Übernehmen
+    </button>
+
+    <p id="deadbandResult"></p>
+</div>
+
 </div>
 
 
@@ -138,7 +159,8 @@ def index():
 
 let targetTemperature = 22.0;
 let targetTemperatureDirty = false;
-
+let temperatureDeadband = 0.5;
+let temperatureDeadbandDirty = false;
 
 async function updateStatus() {
 
@@ -189,7 +211,18 @@ async function updateStatus() {
             ).textContent =
                 targetTemperature.toFixed(1) + " °C";
         }
+        if (
+            status.temperature_deadband !== undefined &&
+            !temperatureDeadbandDirty
+        ) {
+            temperatureDeadband =
+                Number(status.temperature_deadband);
 
+            document.getElementById(
+             "temperatureDeadband"
+            ).textContent =
+                temperatureDeadband.toFixed(1) + " °C";
+        }
 
         document.getElementById(
             "temperature"
@@ -331,6 +364,80 @@ async function sendTargetTemperature() {
     }
 }
 
+    function changeDeadband(change) {
+
+        temperatureDeadband += change;
+        temperatureDeadbandDirty = true;
+
+        if (temperatureDeadband < 0.1) {
+            temperatureDeadband = 0.1;
+        }
+
+        temperatureDeadband =
+            Math.round(temperatureDeadband * 10) / 10;
+
+        document.getElementById(
+            "temperatureDeadband"
+        ).textContent =
+            temperatureDeadband.toFixed(1) + " °C";
+    }
+
+
+    async function sendDeadband() {
+
+        const result =
+            document.getElementById(
+                "deadbandResult"
+            );
+
+        try {
+
+            const response = await fetch(
+                "/api/temperature-deadband",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        temperature_deadband:
+                            temperatureDeadband
+                    })
+                }
+            );
+
+            const data =
+                await response.json();
+
+            if (data.ok) {
+
+                temperatureDeadband =
+                    Number(data.temperature_deadband);
+
+                temperatureDeadbandDirty = false;
+
+                result.textContent =
+                    "Totzone auf " +
+                    data.temperature_deadband +
+                    " °C gesetzt.";
+
+            } else {
+
+                result.textContent =
+                    data.error;
+            }
+
+        } catch (error) {
+
+            result.textContent =
+                "Fehler beim Senden.";
+
+            console.error(error);
+        }
+    }
 
 updateStatus();
 
@@ -363,7 +470,6 @@ def status():
 @app.route("/api/target-temperature", methods=["POST"])
 def set_target_temperature():
     data = request.get_json(silent=True) or {}
-
     try:
         target_temperature = float(data["target_temperature"])
     except (KeyError, TypeError, ValueError):
@@ -393,6 +499,42 @@ def set_target_temperature():
         "ok": True,
         "target_temperature": target_temperature,
     })
+
+@app.route("/api/temperature-deadband", methods=["POST"])
+def set_temperature_deadband():
+    data = request.get_json(silent=True) or {}
+
+    try:
+        temperature_deadband = float(
+            data["temperature_deadband"]
+        )
+    except (KeyError, TypeError, ValueError):
+        return jsonify({
+            "ok": False,
+            "error": "Ungueltige Totzone"
+        }), 400
+
+    if temperature_deadband <= 0:
+        return jsonify({
+            "ok": False,
+            "error": "Totzone muss groesser als 0 sein"
+        }), 400
+
+    try:
+        raspctrl_server.send_command({
+            "type": "set_parameters",
+            "temperature_deadband": temperature_deadband,
+        })
+    except ConnectionError:
+        return jsonify({
+            "ok": False,
+            "error": "RaspCtrl ist nicht verbunden"
+        }), 503
+
+    return jsonify({
+        "ok": True,
+        "temperature_deadband": temperature_deadband,
+    })   
 
 def start_tcp_server():
 
