@@ -101,7 +101,7 @@ class RaspCtrlServer:
 
                 self._process_message(message)
 
-def _process_message(self, message: Dict[str, Any]) -> None:
+    def _process_message(self, message: Dict[str, Any]) -> None:
     """Verarbeitet Nachrichten von RaspCtrl."""
 
     if message.get("type") == "status":
@@ -141,7 +141,7 @@ def _process_message(self, message: Dict[str, Any]) -> None:
             self._client.sendall(payload)
 
 
-def main() -> None:
+    def main() -> None:
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s %(levelname)s %(message)s",
