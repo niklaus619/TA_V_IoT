@@ -16,7 +16,7 @@ class BluefruitSerial:
             import serial
         except ImportError as exc:
             raise RuntimeError("Fuer Bluefruit wird das Paket pyserial benoetigt") from exc
-        self._serial = serial.Serial(port, baudrate=baudrate, timeout=0)
+        self._serial = serial.Serial(port=port, baudrate=baudrate, timeout=0)
         self._buffer = bytearray()
 
     def receive(self) -> List[Dict[str, Any]]:

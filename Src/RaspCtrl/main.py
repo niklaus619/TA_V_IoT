@@ -12,7 +12,7 @@ from server import IoTServerClient
 
 def parse_args():
     parser = argparse.ArgumentParser(description="IoT-Raumklimasteuerung")
-    parser.add_argument("--serial-port", required=True, help="Bluefruit USB-Port, z.B. /dev/ttyACM1")
+    parser.add_argument("--serial-port", default="/dev/ttyACM1", help="Bluefruit USB-Port (Standard: /dev/ttyACM1)")
     parser.add_argument("--server-host", default="127.0.0.1", help="Adresse von Raspberry Pi 2")
     parser.add_argument("--server-port", type=int, default=9000)
     parser.add_argument("--target", type=float, default=22.0, help="Temperatur-Sollwert in Grad Celsius")
