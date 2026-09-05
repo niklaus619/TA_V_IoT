@@ -2,7 +2,7 @@ Datum,Zeit,Stundenaufwand,Beschrieb der Tätigkeit
 30.08.2026,18:00-20:30,2.5,Erste Absprache im Team/Aufgabenverteilung/Know-How Aufbau
 03.09.2026,19:00-20:30,1.5,Know-How Aufbau / Austausch mit Niklaus Janett
 05.09.2026,10:30-16:30,6.0,Tailscale Installation / Austausch mit Niklaus / RaspServ Programmierung / WebGui Programmierung
-05.08.2026,18:30-19.30,1.0,
+05.08.2026,18:30-20.30,2.0,Dark Mode aktiviert im WebGui / CSS der Diagramme angepasst / SenseHAT NeoPixel dem WebGui hinzugefügt
 ,,,
 ,,,
 ,,,
