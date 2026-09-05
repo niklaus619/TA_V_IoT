@@ -1,6 +1,6 @@
 import threading
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 
 from server import RaspCtrlServer
 
@@ -232,6 +232,39 @@ def status():
         }
     )
 
+@app.route("/api/target-temperature", methods=["POST"])
+def set_target_temperature():
+    data = request.get_json(silent=True) or {}
+
+    try:
+        target_temperature = float(data["target_temperature"])
+    except (KeyError, TypeError, ValueError):
+        return jsonify({
+            "ok": False,
+            "error": "Ungueltige Solltemperatur"
+        }), 400
+
+    if not 5.0 <= target_temperature <= 35.0:
+        return jsonify({
+            "ok": False,
+            "error": "Solltemperatur muss zwischen 5 und 35 Grad liegen"
+        }), 400
+
+    try:
+        raspctrl_server.send_command({
+            "type": "set_parameters",
+            "target_temperature": target_temperature,
+        })
+    except ConnectionError:
+        return jsonify({
+            "ok": False,
+            "error": "RaspCtrl ist nicht verbunden"
+        }), 503
+
+    return jsonify({
+        "ok": True,
+        "target_temperature": target_temperature,
+    })
 
 def start_tcp_server():
 
