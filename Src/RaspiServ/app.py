@@ -103,10 +103,6 @@ def index():
             color: #f87171;
         }
 
-        canvas {
-            max-height: 280px;
-        }
-
         @media (max-width: 600px) {
             body {
                 padding: 10px;
@@ -118,6 +114,77 @@ def index():
 
             .card {
                 padding: 16px;
+            }
+        }
+        .charts-section {
+    grid-column: 1 / -1;
+    margin-top: 5px;
+}
+
+        .charts-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 16px;
+        }
+
+        .charts-header h2 {
+            margin: 0;
+            font-size: 26px;
+        }
+
+        .subtitle {
+            margin: 5px 0 0 0;
+            color: #94a3b8;
+        }
+
+        .range-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .range-selector span {
+            color: #94a3b8;
+            font-weight: bold;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .chart-card {
+            min-width: 0;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+
+        /* Tablet */
+        @media (max-width: 1100px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+
+        /* Smartphone */
+        @media (max-width: 600px) {
+            .charts-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .chart-container {
+                height: 250px;
             }
         }
     </style>
@@ -247,43 +314,65 @@ def index():
     <p id="senseNeopixelResult"></p>
 </div>
 
-<div class="card">
-    <h2>Zeitraum</h2>
+<div class="charts-section">
 
-    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+    <div class="charts-header">
+        <div>
+            <h2>Messwertverlauf</h2>
+            <p class="subtitle">
+                Historische Sensordaten
+            </p>
+        </div>
 
-        <button onclick="setHistoryRange(5)">
-            5 Minuten
-        </button>
+        <div class="range-selector">
+            <span>Zeitraum:</span>
 
-        <button onclick="setHistoryRange(30)">
-            30 Minuten
-        </button>
+            <button onclick="setHistoryRange(5)">
+                5 Minuten
+            </button>
 
-        <button onclick="setHistoryRange(60)">
-            1 Stunde
-        </button>
+            <button onclick="setHistoryRange(30)">
+                30 Minuten
+            </button>
+
+            <button onclick="setHistoryRange(60)">
+                1 Stunde
+            </button>
+        </div>
+    </div>
+
+
+    <div class="charts-grid">
+
+        <div class="card chart-card">
+            <h2>Temperatur</h2>
+
+            <div class="chart-container">
+                <canvas id="temperatureChart"></canvas>
+            </div>
+        </div>
+
+
+        <div class="card chart-card">
+            <h2>Luftfeuchtigkeit</h2>
+
+            <div class="chart-container">
+                <canvas id="humidityChart"></canvas>
+            </div>
+        </div>
+
+
+        <div class="card chart-card">
+            <h2>Licht</h2>
+
+            <div class="chart-container">
+                <canvas id="lightChart"></canvas>
+            </div>
+        </div>
 
     </div>
-</div>
-
-<div class="card">
-    <h2>Temperaturverlauf</h2>
-    <canvas id="temperatureChart"></canvas>
-</div>
-
-<div class="card">
-    <h2>Luftfeuchtigkeit</h2>
-    <canvas id="humidityChart"></canvas>
-</div>
-
-<div class="card">
-    <h2>Lichtverlauf</h2>
-    <canvas id="lightChart"></canvas>
-</div>
 
 </div>
-
 
 <script>
 
