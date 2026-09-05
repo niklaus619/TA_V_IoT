@@ -61,6 +61,7 @@ def index():
             color: red;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -134,6 +135,7 @@ def index():
 
     <div class="card">
     <h2>Totzone</h2>
+
     <div style="display:flex; align-items:center; gap:15px;">
         <button onclick="changeDeadband(-0.1)">−</button>
 
@@ -153,6 +155,21 @@ def index():
     <p id="deadbandResult"></p>
 </div>
 
+<div class="card">
+    <h2>Temperaturverlauf</h2>
+    <canvas id="temperatureChart"></canvas>
+</div>
+
+<div class="card">
+    <h2>Luftfeuchtigkeit</h2>
+    <canvas id="humidityChart"></canvas>
+</div>
+
+<div class="card">
+    <h2>Lichtverlauf</h2>
+    <canvas id="lightChart"></canvas>
+</div>
+
 </div>
 
 
@@ -162,6 +179,9 @@ let targetTemperature = 22.0;
 let targetTemperatureDirty = false;
 let temperatureDeadband = 0.5;
 let temperatureDeadbandDirty = false;
+let temperatureChart;
+let humidityChart;
+let lightChart;
 
 async function updateStatus() {
 
@@ -439,12 +459,205 @@ async function sendTargetTemperature() {
             console.error(error);
         }
     }
+function createCharts() {
+
+    temperatureChart = new Chart(
+        document.getElementById("temperatureChart"),
+        {
+            type: "line",
+
+            data: {
+                labels: [],
+                datasets: [
+                    {
+                        label: "Temperatur °C",
+                        data: [],
+                        tension: 0.2
+                    }
+                ]
+            },
+
+            options: {
+                responsive: true,
+                animation: false,
+
+                scales: {
+                    x: {
+                        ticks: {
+                            maxTicksLimit: 8
+                        }
+                    }
+                }
+            }
+        }
+    );
+
+
+    humidityChart = new Chart(
+        document.getElementById("humidityChart"),
+        {
+            type: "line",
+
+            data: {
+                labels: [],
+                datasets: [
+                    {
+                        label: "Luftfeuchtigkeit %",
+                        data: [],
+                        tension: 0.2
+                    }
+                ]
+            },
+
+            options: {
+                responsive: true,
+                animation: false,
+
+                scales: {
+                    x: {
+                        ticks: {
+                            maxTicksLimit: 8
+                        }
+                    }
+                }
+            }
+        }
+    );
+
+
+    lightChart = new Chart(
+        document.getElementById("lightChart"),
+        {
+            type: "line",
+
+            data: {
+                labels: [],
+                datasets: [
+                    {
+                        label: "Licht",
+                        data: [],
+                        tension: 0.2
+                    }
+                ]
+            },
+
+            options: {
+                responsive: true,
+                animation: false,
+
+                scales: {
+                    x: {
+                        ticks: {
+                            maxTicksLimit: 8
+                        }
+                    }
+                }
+            }
+        }
+    );
+}
+
+async function updateHistory() {
+
+    try {
+
+        const response =
+            await fetch("/api/history?limit=100");
+
+        const measurements =
+            await response.json();
+
+
+        const labels =
+            measurements.map(item => {
+
+                const date =
+                    new Date(
+                        item.timestamp
+                            .replace(" ", "T") + "Z"
+                    );
+
+                return date.toLocaleTimeString(
+                    "de-CH",
+                    {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit"
+                    }
+                );
+            });
+
+
+        const temperatures =
+            measurements.map(
+                item => item.temperature
+            );
+
+
+        const humidities =
+            measurements.map(
+                item => item.humidity
+            );
+
+
+        const lights =
+            measurements.map(
+                item => item.light
+            );
+
+
+        temperatureChart.data.labels =
+            labels;
+
+        temperatureChart.data.datasets[0].data =
+            temperatures;
+
+        temperatureChart.update();
+
+
+        humidityChart.data.labels =
+            labels;
+
+        humidityChart.data.datasets[0].data =
+            humidities;
+
+        humidityChart.update();
+
+
+        lightChart.data.labels =
+            labels;
+
+        lightChart.data.datasets[0].data =
+            lights;
+
+        lightChart.update();
+
+    }
+    catch (error) {
+
+        console.error(
+            "Fehler beim Laden der Historie:",
+            error
+        );
+    }
+}
+
+
+createCharts();
 
 updateStatus();
+updateHistory();
+
 
 setInterval(
     updateStatus,
     1000
+);
+
+
+setInterval(
+    updateHistory,
+    5000
 );
 
 </script>
