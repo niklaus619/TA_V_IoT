@@ -55,6 +55,7 @@ class RaspiControllerApp:
                 "blind": state.blind,
                 "heating": state.heating,
                 "cooling": state.cooling,
+                "target_temperature": self.controller.config.target_temperature,
             })
             self._last_status_sent = now
 
