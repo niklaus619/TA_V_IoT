@@ -873,8 +873,10 @@ async function setSenseNeopixel(on) {
     }
 }
 
-createCharts();
+Chart.defaults.color = "#cbd5e1";
+Chart.defaults.borderColor = "#334155";
 
+createCharts();
 updateStatus();
 updateHistory();
 
