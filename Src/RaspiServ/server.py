@@ -1,5 +1,6 @@
 """TCP-Server fuer die Kommunikation mit RaspCtrl."""
 
+from ast import main
 from email import message
 import json
 import logging
@@ -102,18 +103,19 @@ class RaspCtrlServer:
                 self._process_message(message)
 
     def _process_message(self, message: Dict[str, Any]) -> None:
-    """Verarbeitet Nachrichten von RaspCtrl."""
+        """Verarbeitet Nachrichten von RaspCtrl."""
 
-    if message.get("type") == "status":
-        with self._status_lock:
-            self._latest_status = message.copy()
+        if message.get("type") == "status":
+            with self._status_lock:
+                self._latest_status = message.copy()
 
-        save_measurement(message)
+            save_measurement(message)
 
-        LOG.info("Status von RaspCtrl: %s", message)
+            LOG.info("Status von RaspCtrl: %s", message)
 
-    else:
-        LOG.info("Nachricht von RaspCtrl: %s", message)
+        else:
+            LOG.info("Nachricht von RaspCtrl: %s", message)
+
 
     def get_latest_status(self) -> Dict[str, Any]:
         """Gibt den zuletzt empfangenen Status zurueck."""
@@ -121,11 +123,13 @@ class RaspCtrlServer:
         with self._status_lock:
             return self._latest_status.copy()
 
+
     def is_connected(self) -> bool:
         """Prueft, ob RaspCtrl verbunden ist."""
 
         with self._client_lock:
             return self._client is not None
+
 
     def send_command(self, command: Dict[str, Any]) -> None:
         """Sendet einen JSON-Befehl an RaspCtrl."""
@@ -139,7 +143,6 @@ class RaspCtrlServer:
                 raise ConnectionError("RaspCtrl ist nicht verbunden")
 
             self._client.sendall(payload)
-
 
     def main() -> None:
     logging.basicConfig(
