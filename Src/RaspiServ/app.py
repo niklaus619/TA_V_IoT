@@ -736,20 +736,27 @@ function createCharts() {
                         label: "Temperatur °C",
                         data: [],
                         tension: 0.2
+                        pointRadius: 0,
+                        pointHoverRadius: 4,
+                        borderWidth: 2
                     }
                 ]
             },
 
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
                 animation: false,
 
                 scales: {
                     x: {
                         ticks: {
-                            maxTicksLimit: 8
+                            autoSkip: true,
+                            maxTicksLimit: 6,
+                            maxRotation: 0,
+                            minRotation: 0
                         }
-                    }
+                     }
                 }
             }
         }
@@ -768,20 +775,27 @@ function createCharts() {
                         label: "Luftfeuchtigkeit %",
                         data: [],
                         tension: 0.2
+                        pointRadius: 0,
+                        pointHoverRadius: 4,
+                        borderWidth: 2
                     }
                 ]
             },
 
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
                 animation: false,
 
                 scales: {
                     x: {
                         ticks: {
-                            maxTicksLimit: 8
+                            autoSkip: true,
+                            maxTicksLimit: 6,
+                            maxRotation: 0,
+                            minRotation: 0
                         }
-                    }
+                     }
                 }
             }
         }
@@ -800,20 +814,28 @@ function createCharts() {
                         label: "Licht",
                         data: [],
                         tension: 0.2
+                        pointRadius: 0,
+                        pointHoverRadius: 4,
+                        borderWidth: 2
+
                     }
                 ]
             },
 
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
                 animation: false,
 
                 scales: {
                     x: {
                         ticks: {
-                            maxTicksLimit: 8
+                        autoSkip: true,
+                            maxTicksLimit: 6,
+                            maxRotation: 0,
+                            minRotation: 0
                         }
-                    }
+                     }
                 }
             }
         }
