@@ -85,7 +85,7 @@ class RaspiControllerApp:
 
             return
 
-        # NeoPixel-Befehl an das Sense HAT weiterleiten.
+        # Klimaanlagenanzeige auf dem Sense HAT freigeben oder ausschalten.
         if command_type == "set_sense_neopixel":
             on = command.get("on")
 
@@ -100,7 +100,7 @@ class RaspiControllerApp:
             self.sense_hat.set_neopixels(on)
 
             LOG.info(
-                "Sense-HAT NeoPixel auf %s gesetzt",
+                "Klimaanlagenanzeige auf %s gesetzt",
                 "EIN" if on else "AUS"
             )
 

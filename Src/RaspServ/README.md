@@ -90,7 +90,7 @@ Schaltzustaende sind Bits bzw. 0/1-Werte in Holding-Registern, keine Coils.
 | 100 / 101 | Revision / neue Solltemperatur | Grad C mal 10 |
 | 102 / 103 | Revision / neue Totzone | Grad C mal 10 |
 | 104 / 105 | Reserviert | Immer 0, vom Client ignoriert |
-| 106 / 107 | Revision / Sense-HAT-NeoPixel | 0 aus, 1 ein |
+| 106 / 107 | Revision / Klimaanlagenanzeige (Sense HAT) | 0 aus, 1 Regelzustand anzeigen |
 
 RaspCtrl schreibt den gesamten Statusblock 0 bis 5 atomar mit FC16 etwa
 einmal pro Sekunde, sobald Sensordaten vorliegen. Jeder akzeptierte Block
@@ -103,8 +103,15 @@ liefern Exception 03, Datenbankfehler Exception 04.
 Die CPB-NeoPixel zeigen ausschliesslich den Jalousiezustand an: offen = gruen,
 geschlossen = aus. Eine manuelle Steuerung ueber Webseite, Modbus oder den
 USB-Befehl `set_neopixel` ist nicht mehr vorhanden. Der CPB setzt die Anzeige
-beim Start und bei jedem `set_blind`-Befehl selbst. Die Sense-HAT-NeoPixel
-bleiben ueber die Webseite steuerbar; ihre Registeradressen bleiben gleich.
+beim Start und bei jedem `set_blind`-Befehl selbst.
+
+Die Sense-HAT-Bedienung heisst in der Webseite "Klimaanlage". AUS schaltet
+die LEDs aus; die Regelung berechnet ihren Zustand im Hintergrund weiter.
+EIN zeigt den jeweils aktuellen Zustand: Heizen = rot, Kuehlen = blau,
+Aus = dunkel. Auch nach einem Zustandswechsel waehrend AUS wird beim
+Einschalten sofort der aktuelle Zustand angezeigt. Beim Programmstart ist
+die Anzeige freigegeben. Die Modbus-Register und internen Befehlsnamen
+bleiben unveraendert.
 
 RaspCtrl fragt alle 250 ms den Befehlsblock ab. Revision 0 bedeutet kein
 Befehl; neue Revisionen werden einmal angewendet, nach einer Neuverbindung

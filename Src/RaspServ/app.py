@@ -284,7 +284,7 @@ def index():
 </div>
 
 <div class="card">
-    <h2>Sense HAT NeoPixel</h2>
+    <h2>Klimaanlage</h2>
 
     <div style="display:flex; gap:10px;">
         <button onclick="setSenseNeopixel(true)">
@@ -926,8 +926,8 @@ async function setSenseNeopixel(on) {
 
             result.textContent =
                 on
-                    ? "Sense HAT eingeschaltet."
-                    : "Sense HAT ausgeschaltet.";
+                    ? "Klimaanlage eingeschaltet."
+                    : "Klimaanlage ausgeschaltet.";
 
         } else {
 
