@@ -164,20 +164,20 @@ class RaspiControllerApp:
         # Unbekannte Befehle nicht ausfuehren.
         LOG.warning("Unbekannter Serverbefehl: %r", command)
 
-        def _reset_manual_blind_if_needed(self) -> None:
-            if self._blind_mode != "manual":
-                return
+    def _reset_manual_blind_if_needed(self) -> None:
+        if self._blind_mode != "manual":
+            return
 
-            if self._manual_blind_date is None:
-                return
+        if self._manual_blind_date is None:
+            return
 
-            if date.today() == self._manual_blind_date:
-                return
+        if date.today() == self._manual_blind_date:
+            return
 
-            self._blind_mode = "auto"
-            self._manual_blind = None
-            self._manual_blind_date = None
+        self._blind_mode = "auto"
+        self._manual_blind = None
+        self._manual_blind_date = None
 
-            LOG.info(
-                "Mitternacht erreicht: Storensteuerung wieder auf AUTO"
-            )
+        LOG.info(
+            "Mitternacht erreicht: Storensteuerung wieder auf AUTO"
+        )
