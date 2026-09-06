@@ -148,12 +148,42 @@ class RaspCtrlServer:
                 if key in command:
                     value = round(float(command[key]) * 10)
                     if not low <= value <= high:
-                        raise ValueError("Parameter ausserhalb des Modbus-Bereichs")
+                        raise ValueError(
+                            "Parameter ausserhalb des Modbus-Bereichs"
+                        )
                     updates.append((offset, value))
+
+        elif command["type"] == "set_blind_mode":
+            mode = command.get("mode")
+
+            if mode == "auto":
+                value = 0
+
+            elif mode == "manual":
+                blind = command.get("blind")
+
+                if blind == "open":
+                    value = 1
+                elif blind == "closed":
+                    value = 2
+                else:
+                    raise ValueError(
+                        "blind muss open oder closed sein"
+                    )
+
+            else:
+                raise ValueError(
+                    "mode muss auto oder manual sein"
+                )
+
+            updates.append((4, value))
+
         elif command["type"] == "set_sense_neopixel":
             if not isinstance(command["on"], bool):
                 raise ValueError("on muss bool sein")
+
             updates.append((6, int(command["on"])))
+
         else:
             raise ValueError("Unbekannter Befehl")
         with self._lock:
