@@ -106,7 +106,7 @@ class RaspCtrlServer:
                 return error(2)
             values = list(struct.unpack(">6H", pdu[6:]))
             temperature, humidity, light, flags, target, deadband = values
-            if humidity > 1000 or flags > 7 or not 50 <= target <= 350 or deadband == 0:
+            if humidity > 1000 or flags > 15 or not 50 <= target <= 350 or deadband == 0:
                 return error(3)
             status = {
                 "type": "status",
@@ -114,6 +114,7 @@ class RaspCtrlServer:
                 "humidity": humidity / 10,
                 "light": light,
                 "blind": "closed" if flags & 1 else "open",
+                "blind_mode": "manual" if flags & 8 else "auto",
                 "heating": bool(flags & 2),
                 "cooling": bool(flags & 4),
                 "target_temperature": target / 10,
