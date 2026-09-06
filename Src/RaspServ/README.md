@@ -8,6 +8,22 @@ ueber USB. Modbus benoetigt keine zusaetzlichen Python-Pakete.
 
 ## Installation ohne virtuelle Umgebung
 
+`main.py` ist der gemeinsame Startpunkt: Es initialisiert die Datenbank,
+startet Modbus TCP auf Port 502 im Hintergrund und die Webseite auf Port
+5000. Alle Komponenten laufen in einem Prozess; keine weiteren Terminals
+oder separaten Starts von `server.py` und `app.py` sind notwendig.
+
+Manueller Start auf RaspServ (mit Berechtigung fuer Port 502):
+
+```sh
+cd ~/RaspServ/Src/RaspServ
+python3 main.py
+```
+
+Mit Strg+C werden Webseite und Modbus-Listener beendet. Fuer den Start mit
+der benoetigten Portberechtigung und automatischen Start beim Booten den
+unten beschriebenen Dienst verwenden. Nicht parallel zum Dienst starten.
+
 Auf RaspServ:
 
 ```sh
@@ -34,9 +50,12 @@ sudo systemctl enable --now raspserv
 sudo systemctl status raspserv
 ```
 
-Nach Code-Updates: `sudo systemctl restart raspserv`.
+Bei einem bereits installierten Dienst nach dem Wechsel auf `main.py` die
+Service-Datei erneut kopieren, `sudo systemctl daemon-reload` und
+`sudo systemctl restart raspserv` ausfuehren.
+Nach weiteren Code-Updates: `sudo systemctl restart raspserv`.
 Logs: `journalctl -u raspserv -n 50 --no-pager`.
-`python3 app.py` allein hat je nach Linux-Konfiguration keine Berechtigung
+`python3 main.py` allein hat je nach Linux-Konfiguration keine Berechtigung
 fuer Port 502. `server.py` startet nur Modbus ohne Webseite und braucht
 dieselbe Berechtigung; nicht gleichzeitig mit dem Dienst starten.
 

@@ -1221,8 +1221,8 @@ def start_tcp_server():
 
     raspctrl_server.serve_forever()
 
-if __name__ == "__main__":
-
+def run():
+    """Startet alle RaspServ-Komponenten im selben Prozess."""
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     initialize_database()
     raspctrl_server.bind()
@@ -1234,8 +1234,17 @@ if __name__ == "__main__":
 
     tcp_thread.start()
 
-    app.run(
-        host="0.0.0.0",
-        port=5000,
-        debug=False,
-    )
+    try:
+        app.run(
+            host="0.0.0.0",
+            port=5000,
+            debug=False,
+            use_reloader=False,
+        )
+    finally:
+        raspctrl_server.close()
+        tcp_thread.join(timeout=2.0)
+
+
+if __name__ == "__main__":
+    run()
