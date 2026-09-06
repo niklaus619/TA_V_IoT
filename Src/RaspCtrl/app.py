@@ -2,6 +2,7 @@
 
 import logging
 import time
+from datetime import date
 from typing import Any, Dict, Optional
 
 from controller import ClimateController
@@ -20,8 +21,16 @@ class RaspiControllerApp:
         self._last_blind_command: Optional[bool] = None
         self._last_status_sent = 0.0
 
+        # Manuelle Storensteuerung. Standardmaessig arbeitet die Automatik.
+        self._blind_mode = "auto"
+        self._manual_blind: Optional[str] = None
+        self._manual_blind_date: Optional[date] = None
+
     def step(self, now: Optional[float] = None) -> None:
         now = time.monotonic() if now is None else now
+
+        self._reset_manual_blind_if_needed()
+
         for message in self.bluefruit.receive():
             if message.get("type") == "status":
                 self._sensor_data = message
@@ -40,7 +49,17 @@ class RaspiControllerApp:
             return
 
         state = self.controller.update(temperature, light, now)
-        closed = state.blind == "closed"
+
+        # Im manuellen Modus hat der Benutzer Vorrang vor der Automatik.
+        if (
+            self._blind_mode == "manual"
+            and self._manual_blind in ("open", "closed")
+        ):
+            effective_blind = self._manual_blind
+        else:
+            effective_blind = state.blind
+        closed = effective_blind == "closed"
+        
         if closed != self._last_blind_command:
             self.bluefruit.send({"type": "set_blind", "closed": closed})
             self._last_blind_command = closed
@@ -52,7 +71,7 @@ class RaspiControllerApp:
                 "temperature": temperature,
                 "light": light,
                 "humidity": self.sense_hat.humidity(),
-                "blind": state.blind,
+                "blind": effective_blind,
                 "heating": state.heating,
                 "cooling": state.cooling,
                 "target_temperature": self.controller.config.target_temperature,
@@ -85,6 +104,24 @@ class RaspiControllerApp:
 
             return
 
+    def _reset_manual_blind_if_needed(self) -> None:
+        if self._blind_mode != "manual":
+            return
+
+        if self._manual_blind_date is None:
+            return
+
+        if date.today() == self._manual_blind_date:
+            return
+
+        self._blind_mode = "auto"
+        self._manual_blind = None
+        self._manual_blind_date = None
+
+        LOG.info(
+            "Mitternacht erreicht: Storensteuerung wieder auf AUTO"
+        )
+        
         # Klimaanlagenanzeige auf dem Sense HAT freigeben oder ausschalten.
         if command_type == "set_sense_neopixel":
             on = command.get("on")
@@ -105,6 +142,41 @@ class RaspiControllerApp:
             )
 
             return
+        
+        # Storensteuerung automatisch oder manuell setzen.
+        if command_type == "set_blind_mode":
+            mode = command.get("mode")
 
+            if mode == "auto":
+                self._blind_mode = "auto"
+                self._manual_blind = None
+                self._manual_blind_date = None
+
+                LOG.info("Storensteuerung auf AUTO gesetzt")
+                return
+
+            if mode == "manual":
+                blind = command.get("blind")
+
+                if blind not in ("open", "closed"):
+                    LOG.warning(
+                        "Ungueltiger manueller Storenbefehl: %r",
+                        command
+                    )
+                    return
+
+                self._blind_mode = "manual"
+                self._manual_blind = blind
+                self._manual_blind_date = date.today()
+
+                LOG.info(
+                    "Storensteuerung MANUELL: %s",
+                    "OFFEN" if blind == "open" else "GESCHLOSSEN"
+                )
+                return
+
+            LOG.warning("Ungueltiger Storenmodus: %r", command)
+            return
+        
         # Unbekannte Befehle nicht ausfuehren.
         LOG.warning("Unbekannter Serverbefehl: %r", command)
