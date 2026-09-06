@@ -89,7 +89,7 @@ Schaltzustaende sind Bits bzw. 0/1-Werte in Holding-Registern, keine Coils.
 | 5 | Aktuelle Totzone | Grad C mal 10, 1 bis 65535 |
 | 100 / 101 | Revision / neue Solltemperatur | Grad C mal 10 |
 | 102 / 103 | Revision / neue Totzone | Grad C mal 10 |
-| 104 / 105 | Revision / CPB-NeoPixel | 0 aus, 1 ein |
+| 104 / 105 | Reserviert | Immer 0, vom Client ignoriert |
 | 106 / 107 | Revision / Sense-HAT-NeoPixel | 0 aus, 1 ein |
 
 RaspCtrl schreibt den gesamten Statusblock 0 bis 5 atomar mit FC16 etwa
@@ -99,6 +99,12 @@ FC03 kann Teilbereiche innerhalb eines der beiden Bloecke lesen.
 Die Befehlsregister werden von der Webseite gesetzt und sind ueber Modbus
 nur lesbar. FC16 auf andere Adressen liefert Exception 02; ungueltige Werte
 liefern Exception 03, Datenbankfehler Exception 04.
+
+Die CPB-NeoPixel zeigen ausschliesslich den Jalousiezustand an: offen = gruen,
+geschlossen = aus. Eine manuelle Steuerung ueber Webseite, Modbus oder den
+USB-Befehl `set_neopixel` ist nicht mehr vorhanden. Der CPB setzt die Anzeige
+beim Start und bei jedem `set_blind`-Befehl selbst. Die Sense-HAT-NeoPixel
+bleiben ueber die Webseite steuerbar; ihre Registeradressen bleiben gleich.
 
 RaspCtrl fragt alle 250 ms den Befehlsblock ab. Revision 0 bedeutet kein
 Befehl; neue Revisionen werden einmal angewendet, nach einer Neuverbindung

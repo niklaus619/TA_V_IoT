@@ -104,7 +104,8 @@ class IoTServerClient:
                         raise OSError("Ungueltige Registerantwort")
                     registers = struct.unpack(">8H", response[2:])
                     commands = []
-                    for index in range(4):
+                    # Register 104/105 bleiben reserviert; CPB-LEDs zeigen nur die Store an.
+                    for index in (0, 1, 3):
                         revision, value = registers[index * 2:index * 2 + 2]
                         pair = (revision, value)
                         if revision and pair != self._seen[index]:
@@ -112,7 +113,7 @@ class IoTServerClient:
                                 key = ("target_temperature", "temperature_deadband")[index]
                                 commands.append({"type": "set_parameters", key: value / 10})
                             else:
-                                commands.append({"type": ("set_cpb_neopixel", "set_sense_neopixel")[index - 2], "on": bool(value)})
+                                commands.append({"type": "set_sense_neopixel", "on": bool(value)})
                         self._seen[index] = pair
                     with self._lock:
                         # Begrenzt auf den neuesten Befehl pro Parameter/Aktor.

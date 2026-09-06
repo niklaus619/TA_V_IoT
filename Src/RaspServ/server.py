@@ -150,10 +150,10 @@ class RaspCtrlServer:
                     if not low <= value <= high:
                         raise ValueError("Parameter ausserhalb des Modbus-Bereichs")
                     updates.append((offset, value))
-        elif command["type"] in ("set_cpb_neopixel", "set_sense_neopixel"):
+        elif command["type"] == "set_sense_neopixel":
             if not isinstance(command["on"], bool):
                 raise ValueError("on muss bool sein")
-            updates.append((4 if command["type"] == "set_cpb_neopixel" else 6, int(command["on"])))
+            updates.append((6, int(command["on"])))
         else:
             raise ValueError("Unbekannter Befehl")
         with self._lock:

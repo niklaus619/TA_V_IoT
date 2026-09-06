@@ -85,27 +85,6 @@ class RaspiControllerApp:
 
             return
 
-        # NeoPixel-Befehl an den Bluefruit weiterleiten.
-        if command_type == "set_cpb_neopixel":
-            on = command.get("on")
-
-            # Der Zustand muss eindeutig als true oder false uebertragen werden.
-            if not isinstance(on, bool):
-                LOG.warning("Ungueltiger NeoPixel-Befehl: %r", command)
-                return
-
-            self.bluefruit.send({
-                "type": "set_neopixel",
-                "on": on,
-            })
-
-            LOG.info(
-                "CPB NeoPixel auf %s gesetzt",
-                "EIN" if on else "AUS"
-            )
-
-            return
-
         # NeoPixel-Befehl an das Sense HAT weiterleiten.
         if command_type == "set_sense_neopixel":
             on = command.get("on")

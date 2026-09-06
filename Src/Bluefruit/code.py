@@ -28,7 +28,6 @@ def send_status():
 
 def handle_message(message):
     #Einen vom Raspberry Pi empfangenen Storenbefehl verarbeiten.#
-    # Befehle fuer die Store und die NeoPixel werden verarbeitet.
     command_type = message.get("type")
 
     if command_type == "set_blind":
@@ -42,25 +41,6 @@ def handle_message(message):
         server.send({
             "type": "blind_state",
             "blind": "closed" if blind.is_closed() else "open",
-        })
-        return
-
-    # Befehl zum Ein- oder Ausschalten der NeoPixel verarbeiten.
-    if command_type == "set_neopixel":
-        on = message.get("on")
-
-        # Der Zustand muss eindeutig als true oder false uebertragen werden.
-        if not isinstance(on, bool):
-            server.send({"type": "error", "message": "on_must_be_boolean"})
-            return
-
-        # NeoPixel ein- oder ausschalten.
-        blind.set_neopixels(on)
-
-        # Den neuen NeoPixel-Zustand an den Raspberry Pi zurueckmelden.
-        server.send({
-            "type": "neopixel_state",
-            "on": on,
         })
         return
 
