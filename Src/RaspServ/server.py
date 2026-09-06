@@ -9,7 +9,7 @@ import threading
 
 from typing import Any, Dict, Optional
 
-from database import save_measurement
+from database import initialize_database, save_measurement
 
 
 LOG = logging.getLogger(__name__)
@@ -152,6 +152,7 @@ def main() -> None:
             format="%(asctime)s %(levelname)s %(message)s",
         )
 
+        initialize_database()
         server = RaspCtrlServer()
         server.serve_forever()
 
