@@ -72,6 +72,7 @@ class RaspiControllerApp:
                 "light": light,
                 "humidity": self.sense_hat.humidity(),
                 "blind": effective_blind,
+                "blind_mode": self._blind_mode,
                 "heating": state.heating,
                 "cooling": state.cooling,
                 "target_temperature": self.controller.config.target_temperature,

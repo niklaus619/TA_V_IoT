@@ -74,7 +74,12 @@ class IoTServerClient:
                 temperature & 65535,
                 round(float(message["humidity"]) * 10),
                 round(float(message["light"])),
-                int(message["blind"] == "closed") | (int(bool(message["heating"])) << 1) | (int(bool(message["cooling"])) << 2),
+                (
+                    int(message["blind"] == "closed")
+                    | (int(bool(message["heating"])) << 1)
+                    | (int(bool(message["cooling"])) << 2)
+                    | (int(message["blind_mode"] == "manual") << 3)
+                ),
                 round(float(message["target_temperature"]) * 10),
                 round(float(message["temperature_deadband"]) * 10),
             ]
