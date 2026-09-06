@@ -284,6 +284,31 @@ def index():
 </div>
 
 <div class="card">
+    <h2>Storensteuerung</h2>
+
+    Modus:
+    <strong id="blindMode">-</strong>
+
+    <br><br>
+
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button onclick="setBlindMode('auto')">
+            AUTO
+        </button>
+
+        <button onclick="setBlindMode('open')">
+            ÖFFNEN
+        </button>
+
+        <button onclick="setBlindMode('closed')">
+            SCHLIESSEN
+        </button>
+    </div>
+
+    <p id="blindModeResult"></p>
+</div>
+
+<div class="card">
     <h2>Klimaanlage</h2>
 
     <div style="display:flex; gap:10px;">
@@ -468,6 +493,12 @@ async function updateStatus() {
         ).textContent =
             status.blind ?? "-";
 
+        document.getElementById(
+            "blindMode"
+        ).textContent =
+            status.blind_mode === "manual"
+                ? "MANUELL"
+                : "AUTO";   
 
         document.getElementById(
             "heating"
@@ -900,6 +931,82 @@ async function updateHistory() {
     }
 }
 
+async function setBlindMode(action) {
+
+    const result =
+        document.getElementById("blindModeResult");
+
+    let payload;
+
+    if (action === "auto") {
+        payload = {
+            mode: "auto"
+        };
+    }
+    else if (action === "open") {
+        payload = {
+            mode: "manual",
+            blind: "open"
+        };
+    }
+    else if (action === "closed") {
+        payload = {
+            mode: "manual",
+            blind: "closed"
+        };
+    }
+    else {
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            "/api/blind-mode",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            }
+        );
+
+        const data = await response.json();
+
+        if (response.ok && data.ok) {
+
+            if (action === "auto") {
+                result.textContent =
+                    "Storensteuerung auf AUTO gesetzt.";
+            }
+            else if (action === "open") {
+                result.textContent =
+                    "Store manuell geöffnet.";
+            }
+            else {
+                result.textContent =
+                    "Store manuell geschlossen.";
+            }
+
+            updateStatus();
+        }
+        else {
+            result.textContent =
+                data.error ||
+                "Fehler beim Schalten.";
+        }
+
+    }
+    catch (error) {
+
+        result.textContent =
+            "Fehler bei der Verbindung.";
+
+        console.error(error);
+    }
+}
+
 async function setSenseNeopixel(on) {
 
     const result =
@@ -1091,6 +1198,54 @@ def set_temperature_deadband():
     return jsonify({
         "ok": True,
         "temperature_deadband": temperature_deadband,
+    })
+
+@app.route("/api/blind-mode", methods=["POST"])
+def set_blind_mode():
+    data = request.get_json(silent=True) or {}
+
+    mode = data.get("mode")
+
+    if mode == "auto":
+        command = {
+            "type": "set_blind_mode",
+            "mode": "auto",
+        }
+
+    elif mode == "manual":
+        blind = data.get("blind")
+
+        if blind not in ("open", "closed"):
+            return jsonify({
+                "ok": False,
+                "error": "blind muss open oder closed sein"
+            }), 400
+
+        command = {
+            "type": "set_blind_mode",
+            "mode": "manual",
+            "blind": blind,
+        }
+
+    else:
+        return jsonify({
+            "ok": False,
+            "error": "mode muss auto oder manual sein"
+        }), 400
+
+    try:
+        raspctrl_server.send_command(command)
+
+    except ConnectionError:
+        return jsonify({
+            "ok": False,
+            "error": "RaspCtrl ist nicht verbunden"
+        }), 503
+
+    return jsonify({
+        "ok": True,
+        "mode": mode,
+        "blind": data.get("blind"),
     })
 
 @app.route("/api/sense-neopixel", methods=["POST"])
