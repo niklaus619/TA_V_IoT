@@ -1,3 +1,4 @@
+import logging
 import threading
 
 from flask import Flask, jsonify, request
@@ -14,7 +15,7 @@ app = Flask(__name__)
 
 raspctrl_server = RaspCtrlServer(
     host="0.0.0.0",
-    port=9000,
+    port=502,
 )
 
 
@@ -1100,6 +1101,8 @@ def set_target_temperature():
             "error": "Solltemperatur muss zwischen 5 und 35 Grad liegen"
         }), 400
 
+    target_temperature = round(target_temperature, 1)
+
     try:
         raspctrl_server.send_command({
             "type": "set_parameters",
@@ -1130,11 +1133,13 @@ def set_temperature_deadband():
             "error": "Ungueltige Totzone"
         }), 400
 
-    if temperature_deadband <= 0:
+    if not 0.1 <= temperature_deadband <= 6553.5:
         return jsonify({
             "ok": False,
-            "error": "Totzone muss groesser als 0 sein"
+            "error": "Totzone muss zwischen 0.1 und 6553.5 Grad liegen"
         }), 400
+
+    temperature_deadband = round(temperature_deadband, 1)
 
     try:
         raspctrl_server.send_command({
@@ -1218,12 +1223,9 @@ def start_tcp_server():
 
 if __name__ == "__main__":
 
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     initialize_database()
-
-    tcp_thread = threading.Thread(
-        target=start_tcp_server,
-        daemon=True,
-    )
+    raspctrl_server.bind()
 
     tcp_thread = threading.Thread(
         target=start_tcp_server,

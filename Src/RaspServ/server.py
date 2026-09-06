@@ -1,160 +1,173 @@
-"""TCP-Server fuer die Kommunikation mit RaspCtrl."""
+﻿"""Modbus-TCP-Server (FC03/FC16), Registerbelegung siehe README.md."""
 
-from ast import main
-from email import message
-import json
 import logging
-import socket
+import socketserver
+import struct
 import threading
-
-from typing import Any, Dict, Optional
+import time
 
 from database import initialize_database, save_measurement
-
 
 LOG = logging.getLogger(__name__)
 
 
-class RaspCtrlServer:
-    def __init__(self, host: str = "0.0.0.0", port: int = 9000):
-        self.host = host
-        self.port = port
+def _read_exact(sock, size):
+    data = bytearray()
+    while len(data) < size:
+        chunk = sock.recv(size - len(data))
+        if not chunk:
+            raise ConnectionError("Modbus-Verbindung geschlossen")
+        data.extend(chunk)
+    return bytes(data)
 
-        self._client: Optional[socket.socket] = None
-        self._client_lock = threading.Lock()
 
-        self._latest_status: Dict[str, Any] = {}
-        self._status_lock = threading.Lock()
+class _TCPServer(socketserver.ThreadingTCPServer):
+    allow_reuse_address = True
+    daemon_threads = True
 
-    def serve_forever(self) -> None:
-        """Startet den TCP-Server und wartet auf RaspCtrl."""
 
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
-            server_socket.setsockopt(
-                socket.SOL_SOCKET,
-                socket.SO_REUSEADDR,
-                1,
-            )
-
-            server_socket.bind((self.host, self.port))
-            server_socket.listen(1)
-
-            LOG.info(
-                "RaspServ wartet auf Verbindung auf %s:%s",
-                self.host,
-                self.port,
-            )
-
+class _Handler(socketserver.BaseRequestHandler):
+    def handle(self):
+        self.request.settimeout(5.0)
+        owner = self.server.owner
+        try:
             while True:
-                client, address = server_socket.accept()
-
-                LOG.info(
-                    "RaspCtrl verbunden: %s:%s",
-                    address[0],
-                    address[1],
-                )
-
-                with self._client_lock:
-                    self._client = client
-
-                try:
-                    self._handle_client(client)
-                except OSError as exc:
-                    LOG.warning("Verbindung zu RaspCtrl verloren: %s", exc)
-                finally:
-                    with self._client_lock:
-                        if self._client is client:
-                            self._client = None
-
-                    client.close()
-
-                    LOG.info("RaspCtrl getrennt")
-
-    def _handle_client(self, client: socket.socket) -> None:
-        """Empfaengt JSON-Lines von RaspCtrl."""
-
-        buffer = bytearray()
-
-        while True:
-            data = client.recv(4096)
-
-            if not data:
-                return
-
-            buffer.extend(data)
-
-            while b"\n" in buffer:
-                raw_message, _, remainder = buffer.partition(b"\n")
-                buffer[:] = remainder
-
-                if not raw_message:
-                    continue
-
-                try:
-                    message = json.loads(raw_message.decode("utf-8"))
-                except (UnicodeError, json.JSONDecodeError):
-                    LOG.warning(
-                        "Ungueltige Nachricht empfangen: %r",
-                        raw_message,
-                    )
-                    continue
-
-                if not isinstance(message, dict):
-                    continue
-
-                self._process_message(message)
-
-    def _process_message(self, message: Dict[str, Any]) -> None:
-        """Verarbeitet Nachrichten von RaspCtrl."""
-
-        if message.get("type") == "status":
-            with self._status_lock:
-                self._latest_status = message.copy()
-
-            save_measurement(message)
-
-            LOG.info("Status von RaspCtrl: %s", message)
-
-        else:
-            LOG.info("Nachricht von RaspCtrl: %s", message)
+                transaction, protocol, length, unit = struct.unpack(">HHHB", _read_exact(self.request, 7))
+                if protocol != 0 or not 2 <= length <= 254:
+                    return
+                pdu = _read_exact(self.request, length - 1)
+                if unit != 1:
+                    response = bytes([pdu[0] | 0x80, 11])
+                else:
+                    response = owner._process_pdu(pdu)
+                self.request.sendall(struct.pack(">HHHB", transaction, 0, len(response) + 1, unit) + response)
+        except OSError:
+            pass
 
 
-    def get_latest_status(self) -> Dict[str, Any]:
-        """Gibt den zuletzt empfangenen Status zurueck."""
+class RaspCtrlServer:
+    def __init__(self, host="0.0.0.0", port=502):
+        self.host, self.port = host, port
+        self._lock = threading.RLock()
+        self._status = [0] * 6
+        self._commands = [0] * 8
+        self._latest_status = {}
+        self._last_seen = None
+        self._tcp = None
 
-        with self._status_lock:
+    def bind(self):
+        """Bindet vor dem Start der Webseite; Portfehler brechen den Start ab."""
+        if self._tcp is None:
+            self._tcp = _TCPServer((self.host, self.port), _Handler)
+            self._tcp.owner = self
+            self.port = self._tcp.server_address[1]
+        return self
+
+    def serve_forever(self):
+        self.bind()
+        LOG.info("Modbus TCP wartet auf %s:%s (Unit-ID 1)", self.host, self.port)
+        self._tcp.serve_forever()
+
+    def close(self):
+        if self._tcp is not None:
+            self._tcp.shutdown()
+            self._tcp.server_close()
+            self._tcp = None
+
+    def _process_pdu(self, pdu):
+        function = pdu[0]
+        def error(code):
+            return bytes([function | 0x80, code])
+
+        with self._lock:
+            if function == 3:
+                if len(pdu) != 5:
+                    return error(3)
+                address, count = struct.unpack(">HH", pdu[1:])
+                if not 1 <= count <= 125:
+                    return error(3)
+                if 0 <= address and address + count <= 6:
+                    values = self._status[address:address + count]
+                elif 100 <= address and address + count <= 108:
+                    values = self._commands[address - 100:address - 100 + count]
+                    self._last_seen = time.monotonic()
+                else:
+                    return error(2)
+                return bytes([3, count * 2]) + struct.pack(">" + "H" * count, *values)
+            if function != 16:
+                return error(1)
+            if len(pdu) < 6:
+                return error(3)
+            address, count, byte_count = struct.unpack(">HHB", pdu[1:6])
+            if not 1 <= count <= 123 or byte_count != count * 2 or len(pdu) != 6 + byte_count:
+                return error(3)
+            # Ein kompletter Status wird atomar uebertragen und gespeichert.
+            if address != 0 or count != 6:
+                return error(2)
+            values = list(struct.unpack(">6H", pdu[6:]))
+            temperature, humidity, light, flags, target, deadband = values
+            if humidity > 1000 or flags > 7 or not 50 <= target <= 350 or deadband == 0:
+                return error(3)
+            status = {
+                "type": "status",
+                "temperature": (temperature if temperature < 32768 else temperature - 65536) / 10,
+                "humidity": humidity / 10,
+                "light": light,
+                "blind": "closed" if flags & 1 else "open",
+                "heating": bool(flags & 2),
+                "cooling": bool(flags & 4),
+                "target_temperature": target / 10,
+                "temperature_deadband": deadband / 10,
+            }
+            try:
+                save_measurement(status)
+            except Exception:
+                LOG.exception("Messwert konnte nicht gespeichert werden")
+                return error(4)
+            self._status = values
+            self._latest_status = status
+            self._last_seen = time.monotonic()
+            return pdu[:5]
+
+    def get_latest_status(self):
+        with self._lock:
             return self._latest_status.copy()
 
+    def is_connected(self):
+        with self._lock:
+            return self._last_seen is not None and time.monotonic() - self._last_seen < 5.0
 
-    def is_connected(self) -> bool:
-        """Prueft, ob RaspCtrl verbunden ist."""
-
-        with self._client_lock:
-            return self._client is not None
-
-
-    def send_command(self, command: Dict[str, Any]) -> None:
-        """Sendet einen JSON-Befehl an RaspCtrl."""
-
-        payload = (
-            json.dumps(command, separators=(",", ":")) + "\n"
-        ).encode("utf-8")
-
-        with self._client_lock:
-            if self._client is None:
+    def send_command(self, command):
+        """Stellt Sollwerte bereit; RaspCtrl liest sie beim naechsten Poll."""
+        updates = []
+        if command["type"] == "set_parameters":
+            for offset, key, low, high in (
+                (0, "target_temperature", 50, 350),
+                (2, "temperature_deadband", 1, 65535),
+            ):
+                if key in command:
+                    value = round(float(command[key]) * 10)
+                    if not low <= value <= high:
+                        raise ValueError("Parameter ausserhalb des Modbus-Bereichs")
+                    updates.append((offset, value))
+        elif command["type"] in ("set_cpb_neopixel", "set_sense_neopixel"):
+            if not isinstance(command["on"], bool):
+                raise ValueError("on muss bool sein")
+            updates.append((4 if command["type"] == "set_cpb_neopixel" else 6, int(command["on"])))
+        else:
+            raise ValueError("Unbekannter Befehl")
+        with self._lock:
+            if not self.is_connected():
                 raise ConnectionError("RaspCtrl ist nicht verbunden")
+            for offset, value in updates:
+                self._commands[offset] = self._commands[offset] % 65535 + 1
+                self._commands[offset + 1] = value
 
-            self._client.sendall(payload)
-            
-def main() -> None:
-        logging.basicConfig(
-            level=logging.INFO,
-            format="%(asctime)s %(levelname)s %(message)s",
-        )
 
-        initialize_database()
-        server = RaspCtrlServer()
-        server.serve_forever()
+def main():
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+    initialize_database()
+    RaspCtrlServer().serve_forever()
 
 
 if __name__ == "__main__":
