@@ -84,12 +84,12 @@ Schaltzustaende sind Bits bzw. 0/1-Werte in Holding-Registern, keine Coils.
 | 0 | Isttemperatur | Vorzeichenbehaftet, Grad C mal 10 |
 | 1 | Luftfeuchtigkeit | Prozent mal 10, 0 bis 1000 |
 | 2 | Licht | Ganzzahl, 0 bis 65535 |
-| 3 | Statusbits | Bit 0: Store geschlossen, Bit 1: Heizung, Bit 2: Kuehlung |
+| 3 | Statusbits | Bit 0: Store geschlossen, Bit 1: Heizung, Bit 2: Kuehlung, Bit 3: Storensteuerung manuell |
 | 4 | Aktuelle Solltemperatur | Grad C mal 10, 50 bis 350 |
 | 5 | Aktuelle Totzone | Grad C mal 10, 1 bis 65535 |
 | 100 / 101 | Revision / neue Solltemperatur | Grad C mal 10 |
 | 102 / 103 | Revision / neue Totzone | Grad C mal 10 |
-| 104 / 105 | Reserviert | Immer 0, vom Client ignoriert |
+| 104 / 105 | Revision / Storensteuerung | 0 = AUTO, 1 = MANUELL OFFEN, 2 = MANUELL GESCHLOSSEN |
 | 106 / 107 | Revision / Klimaanlagenanzeige (Sense HAT) | 0 aus, 1 Regelzustand anzeigen |
 
 RaspCtrl schreibt den gesamten Statusblock 0 bis 5 atomar mit FC16 etwa
@@ -99,19 +99,37 @@ FC03 kann Teilbereiche innerhalb eines der beiden Bloecke lesen.
 Die Befehlsregister werden von der Webseite gesetzt und sind ueber Modbus
 nur lesbar. FC16 auf andere Adressen liefert Exception 02; ungueltige Werte
 liefern Exception 03, Datenbankfehler Exception 04.
+Die Storensteuerung verwendet das Befehlspaar 104/105. Jede Aenderung erhoeht
+die Revision, damit RaspCtrl den neuen Befehl beim naechsten Poll erkennt.
+Der aktuelle Modus AUTO oder MANUELL wird von RaspCtrl ueber Bit 3 des
+Statusregisters 3 an RaspServ zurueckgemeldet.
 
-Die CPB-NeoPixel zeigen ausschliesslich den Jalousiezustand an: offen = gruen,
-geschlossen = aus. Eine manuelle Steuerung ueber Webseite, Modbus oder den
-USB-Befehl `set_neopixel` ist nicht mehr vorhanden. Der CPB setzt die Anzeige
-beim Start und bei jedem `set_blind`-Befehl selbst.
+Die Storen koennen ueber die Webseite automatisch oder manuell gesteuert werden.
+Im Modus AUTO bestimmt die lokale Klimaregelung auf RaspCtrl den Storenstatus
+anhand von Temperatur und Lichteinfall.
+
+Mit den Webbefehlen OEFFNEN oder SCHLIESSEN wechselt die Storensteuerung
+automatisch in den Modus MANUELL. Der manuell gewaehlte Zustand hat Vorrang
+vor der autonomen Storenregelung und wird nicht direkt durch diese
+ueberschrieben. Heizung und Kuehlung werden auch im manuellen Storenmodus
+weiterhin autonom geregelt.
+
+Der Benutzer kann jederzeit wieder auf AUTO wechseln. Zusaetzlich wird der
+manuelle Modus beim ersten Regelzyklus nach Mitternacht automatisch beendet,
+wodurch die autonome Storenregelung wieder uebernimmt.
+
+Die CPB-NeoPixel zeigen weiterhin ausschliesslich den tatsaechlichen
+Storenstatus an: offen = gruen, geschlossen = aus. Sie werden nicht direkt
+ueber die Webseite gesteuert, sondern vom CPB bei jedem `set_blind`-Befehl
+entsprechend dem Storenstatus gesetzt.
 
 Die Sense-HAT-Bedienung heisst in der Webseite "Klimaanlage". AUS schaltet
 die LEDs aus; die Regelung berechnet ihren Zustand im Hintergrund weiter.
 EIN zeigt den jeweils aktuellen Zustand: Heizen = rot, Kuehlen = blau,
 Aus = dunkel. Auch nach einem Zustandswechsel waehrend AUS wird beim
 Einschalten sofort der aktuelle Zustand angezeigt. Beim Programmstart ist
-die Anzeige freigegeben. Die Modbus-Register und internen Befehlsnamen
-bleiben unveraendert.
+die Anzeige freigegeben. Die Modbus-Register 106/107 fuer die
+Klimaanlagenanzeige bleiben unveraendert.
 
 RaspCtrl fragt alle 250 ms den Befehlsblock ab. Revision 0 bedeutet kein
 Befehl; neue Revisionen werden einmal angewendet, nach einer Neuverbindung
