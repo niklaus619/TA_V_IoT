@@ -104,16 +104,62 @@ class IoTServerClient:
                         raise OSError("Ungueltige Registerantwort")
                     registers = struct.unpack(">8H", response[2:])
                     commands = []
-                    # Register 104/105 bleiben reserviert; CPB-LEDs zeigen nur die Store an.
-                    for index in (0, 1, 3):
+
+                    # Alle vier Befehlspaare auswerten.
+                    for index in (0, 1, 2, 3):
                         revision, value = registers[index * 2:index * 2 + 2]
                         pair = (revision, value)
+
                         if revision and pair != self._seen[index]:
+
                             if index < 2:
-                                key = ("target_temperature", "temperature_deadband")[index]
-                                commands.append({"type": "set_parameters", key: value / 10})
+                                key = (
+                                    "target_temperature",
+                                    "temperature_deadband"
+                                )[index]
+
+                                commands.append({
+                                    "type": "set_parameters",
+                                    key: value / 10
+                                })
+
+                            elif index == 2:
+                                # Register 104/105:
+                                # 0 = AUTO
+                                # 1 = MANUELL OFFEN
+                                # 2 = MANUELL GESCHLOSSEN
+                                if value == 0:
+                                    commands.append({
+                                        "type": "set_blind_mode",
+                                        "mode": "auto"
+                                    })
+
+                                elif value == 1:
+                                    commands.append({
+                                        "type": "set_blind_mode",
+                                        "mode": "manual",
+                                        "blind": "open"
+                                    })
+
+                                elif value == 2:
+                                    commands.append({
+                                        "type": "set_blind_mode",
+                                        "mode": "manual",
+                                        "blind": "closed"
+                                    })
+
+                                else:
+                                    LOG.warning(
+                                        "Ungueltiger Storenbefehl aus Modbus: %s",
+                                        value
+                                    )
+
                             else:
-                                commands.append({"type": "set_sense_neopixel", "on": bool(value)})
+                                commands.append({
+                                    "type": "set_sense_neopixel",
+                                    "on": bool(value)
+                                })
+
                         self._seen[index] = pair
                     with self._lock:
                         # Begrenzt auf den neuesten Befehl pro Parameter/Aktor.
