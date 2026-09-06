@@ -665,6 +665,8 @@ function createCharts() {
                 datasets: [
                     {
                         label: "Temperatur °C",
+                        borderColor: "#4ade80",
+                        backgroundColor: "#4ade80",
                         data: [],
                         tension: 0.2,
                         pointRadius: 0,
@@ -715,6 +717,8 @@ function createCharts() {
                 datasets: [
                     {
                         label: "Luftfeuchtigkeit %",
+                        borderColor: "#f87171",
+                        backgroundColor: "#f87171",
                         data: [],
                         tension: 0.2,
                         pointRadius: 0,
@@ -765,6 +769,8 @@ function createCharts() {
                 datasets: [
                     {
                         label: "Licht",
+                        borderColor: "#facc15",
+                        backgroundColor: "#facc15",
                         data: [],
                         tension: 0.2,
                         pointRadius: 0,
