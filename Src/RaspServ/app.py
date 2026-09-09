@@ -341,12 +341,16 @@ def index():
                 5 Minuten
             </button>
 
-            <button onclick="setHistoryRange(30)">
-                30 Minuten
-            </button>
-
             <button onclick="setHistoryRange(60)">
                 1 Stunde
+            </button>
+
+            <button onclick="setHistoryRange(1440)">
+                1 Tag
+            </button>
+
+            <button onclick="setHistoryRange(10080)">
+                1 Woche
             </button>
         </div>
     </div>
@@ -1118,6 +1122,8 @@ def history():
         5,
         30,
         60,
+        1440,
+        10080,
     }
 
     if minutes not in allowed_minutes:
