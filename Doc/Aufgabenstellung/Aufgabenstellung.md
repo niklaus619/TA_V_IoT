@@ -14,13 +14,13 @@ Aufgaben:
 - Storenstatus über D13-LED anzeigen
 - NeoPixel ansteuern
 
-Die Kommunikation mit Raspberry Pi 1 erfolgt bidirektional über **Bluetooth Low Energy (BLE)**.
+Die Kommunikation mit Raspberry Pi 1 erfolgt bidirektional über eine **serielle UART-Verbindung über USB-CDC**.
 
 ## Raspberry Pi 1 – Steuerung
 
 Raspberry Pi 1 übernimmt die zentrale Steuerungslogik:
 
-- Messwerte des CPB über BLE empfangen
+- Messwerte des CPB über UART empfangen
 - Luftfeuchtigkeit über Sense HAT V2 messen
 - Raumklimaregelung ausführen
 - Storen-, Heiz- und Kühlbefehle berechnen
@@ -60,7 +60,7 @@ Die Kommunikation mit Raspberry Pi 1 erfolgt über **TCP/IP im WLAN oder Etherne
 
 ## Datenfluss
 
-**CPB ⇄ BLE ⇄ Raspberry Pi 1 ⇄ TCP/IP ⇄ Raspberry Pi 2 ⇄ Browser**
+**CPB ⇄ UART/USB-CDC ⇄ Raspberry Pi 1 ⇄ TCP/IP ⇄ Raspberry Pi 2 ⇄ Browser**
 
 Dabei gilt:
 
