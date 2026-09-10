@@ -1,0 +1,111 @@
+<mxfile host="65bd71144e">
+    <diagram id="raspserv-simple" name="RaspServ – vereinfacht">
+        <mxGraphModel dx="1506" dy="988" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="1000" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="title" value="RaspServ – Flussdiagramm" style="text;html=1;fontSize=24;fontStyle=1;align=center;" parent="1" vertex="1">
+                    <mxGeometry x="250" y="20" width="660" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="a" value="Programmstart&#xa;main.py" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=16;" parent="1" vertex="1">
+                    <mxGeometry x="460" y="80" width="240" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="b" value="SQLite-Datenbank initialisieren" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=16;" parent="1" vertex="1">
+                    <mxGeometry x="440" y="180" width="280" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="c" value="Modbus-Server (Port 502) und&#xa;Webserver (Port 5000) starten" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=16;" parent="1" vertex="1">
+                    <mxGeometry x="420" y="280" width="320" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="d" value="Auf Modbus-Anfrage&#xa;von RaspCtrl warten" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=16;" parent="1" vertex="1">
+                    <mxGeometry x="160" y="410" width="280" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="e" value="Auf Anfrage der&#xa;Weboberfläche warten" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=16;" parent="1" vertex="1">
+                    <mxGeometry x="730" y="410" width="280" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="f" value="Art der&#xa;Anfrage?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=16;" parent="1" vertex="1">
+                    <mxGeometry x="220" y="520" width="160" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="i" value="Art der&#xa;Anfrage?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=16;" parent="1" vertex="1">
+                    <mxGeometry x="790" y="520" width="160" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="g" value="Messwerte prüfen und speichern;&#xa;aktuellen Status aktualisieren" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=15;" parent="1" vertex="1">
+                    <mxGeometry x="50" y="690" width="240" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="h" value="Bereitgestellte Befehle&#xa;an RaspCtrl zurückgeben" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=15;" parent="1" vertex="1">
+                    <mxGeometry x="320" y="690" width="230" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="j" value="Status und&#xa;Messwertverlauf liefern" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=15;" parent="1" vertex="1">
+                    <mxGeometry x="620" y="690" width="230" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="k" value="Eingabe und Verbindung prüfen;&#xa;Befehl bereitstellen oder&#xa;Fehler zurückmelden" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=15;" parent="1" vertex="1">
+                    <mxGeometry x="880" y="690" width="240" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="note" value="Beide Zweige laufen parallel und bearbeiten fortlaufend Anfragen.&#xa;RaspCtrl holt Befehle selbstständig ab und führt die Klimaregelung aus.&#xa;Vereinfacht: Protokolldetails, Fehlerpfade und Programmende sind ausgeblendet." style="text;html=1;whiteSpace=wrap;align=center;fontSize=14;fontColor=#555555;" parent="1" vertex="1">
+                    <mxGeometry x="200" y="880" width="770" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="ab" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;" parent="1" source="a" target="b" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="bc" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;" parent="1" source="b" target="c" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="cd" value="parallel" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;exitX=0.25;exitY=1;entryX=0.5;entryY=0;fontSize=13;" parent="1" source="c" target="d" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="ce" value="parallel" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;exitX=0.75;exitY=1;entryX=0.5;entryY=0;fontSize=13;" parent="1" source="c" target="e" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="df" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;" parent="1" source="d" target="f" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="ei" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;" parent="1" source="e" target="i" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="fg" value="Status übertragen" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;exitX=0;exitY=0.5;entryX=0.5;entryY=0;fontSize=13;" parent="1" source="f" target="g" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="fh" value="Befehle abfragen" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;exitX=1;exitY=0.5;entryX=0.5;entryY=0;fontSize=13;" parent="1" source="f" target="h" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="ij" value="Daten anzeigen" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;exitX=0;exitY=0.5;entryX=0.5;entryY=0;fontSize=13;" parent="1" source="i" target="j" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="ik" value="Einstellung ändern" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;exitX=1;exitY=0.5;entryX=0.5;entryY=0;fontSize=13;" parent="1" source="i" target="k" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="gd" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;exitX=0;exitY=0.5;entryX=0;entryY=0.5;" parent="1" source="g" target="d" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="30" y="730"/>
+                            <mxPoint x="30" y="440"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="hd" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;exitX=1;exitY=0.5;entryX=1;entryY=0.5;" parent="1" source="h" target="d" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="570" y="730"/>
+                            <mxPoint x="570" y="440"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="je" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;exitX=0;exitY=0.5;entryX=0;entryY=0.5;" parent="1" source="j" target="e" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="600" y="730"/>
+                            <mxPoint x="600" y="440"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="ke" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;exitX=1;exitY=0.5;entryX=1;entryY=0.5;" parent="1" source="k" target="e" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1140" y="730"/>
+                            <mxPoint x="1140" y="440"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
